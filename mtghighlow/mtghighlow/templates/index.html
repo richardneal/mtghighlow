@@ -5,7 +5,7 @@
         <div name="lastcard">
             <h3 name="nameoldheader">Last Card: {{nameold}}</h3>
             <h2 name="result">{{correct}} (Streak: {{streak}} / Best streak: {{beststreak}})</h2>
-            <p name="priceoldheader">Fake Price: {{fakepriceold}} | Real Price: {{realpriceold}}</p>
+            <p name="priceoldheader">Fake Price: ${{fakepriceold}} | Real Price: ${{realpriceold}}</p>
         </div>
         {% endif %}
         <div name="newcard">
@@ -14,7 +14,7 @@
         </div>
         <div name="selector">
             <button type="submit" value="higher" name="higherbutton">The real price is higher!</button>
-            <h1 name="fakepriceheader">{{fakepricenew}}</h1>
+            <h1 name="fakepriceheader">${{fakepricenew}}</h1>
             <button type="submit" value="lower" name="lowerbutton">The real price is lower!</button>
         </div>
     </form>
