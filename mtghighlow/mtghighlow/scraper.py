@@ -1,4 +1,4 @@
-#
+﻿#
 #   Scraping Utilities
 #
 
@@ -46,7 +46,7 @@ def getCFBPrice(cardName, cardSet):
     tempIndex = rawHTML.find("grid-item-price")
     startPriceIndex = rawHTML.find("$", tempIndex)
     endPriceIndex = rawHTML.find("<", startPriceIndex)
-    cfbPrice = rawHTML[startPriceIndex:endPriceIndex]
+    cfbPrice = rawHTML[startPriceIndex+1:endPriceIndex]
     return [cfbPrice]
 
 #
