@@ -50,7 +50,11 @@ class Card:
         if fakeprice:
             self.fakeprice = fakeprice
         else:
-            fakepricefloat = float(self.realprice) + float(self.realprice) * .01 * random.randrange(-90,100)
+            try:
+                fakepricefloat = float(self.realprice)*(1 + .01 * random.randrange(-90,100))
+            except:
+                fakepricefloat = -1.0
             self.fakeprice = '{:0,.2f}'.format(fakepricefloat)
+
 
         self.image = getCardImageURL(cardname, None)[0]
