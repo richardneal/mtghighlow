@@ -20,17 +20,17 @@ class Streak:
 
         if result == "Higher":
             if self.lastcard.fakeprice > self.lastcard.realprice:
-                correct = "Incorrect: The real price is LOWER"
+                correct = "WRONG"
                 self.streak = 0
             elif self.lastcard.fakeprice < self.lastcard.realprice:
-                correct = "Correct: The real price is HIGHER"
+                correct = "CORRECT"
                 self.streak += 1
         elif result == "Lower":
             if self.lastcard.fakeprice < self.lastcard.realprice:
-                correct = "Incorrect: The real price is HIGHER"
+                correct = "WRONG"
                 self.streak = 0
             elif self.lastcard.fakeprice > self.lastcard.realprice:
-                correct = "Correct: The real price is LOWER"
+                correct = "CORRECT"
                 self.streak += 1
         if self.beststreak < self.streak:
             self.beststreak = self.streak
