@@ -1,61 +1,80 @@
 $('a[href*=#]').click(function(){return false;});
 
 var animationEndEvent = "webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend";
+var cs = new CardStack();
 
-var Person = {
-	wrap: $('#people'),
-	people: [ 
-		{name: 'Stone Rain', set: 'SET', img: "http://magiccards.info/scans/en/fnmp/10.jpg"},
-	],
-	add: function(){
-		var random = this.people[Math.floor(Math.random() * this.people.length)];
-		this.wrap.append("<div class='person'><img alt='" + random.name + "' src='" + random.img + "' /><span><strong>" + random.name + ", " + random.set + "</strong></span></div>");
-	}
+function CardStack() {
+    var wrap = $('#cards');
+    var q = new Queue();
+    var currentcard;
+
+    this.updatevisuals = function (newcard, lastcard, streak) {
+        $('#displayprice').html(newcard.fakeprice);
+        if (lastcard != null) {
+            $('#fakepriceold').html(lastcard.fakeprice);
+            $('#realpriceold').html(lastcard.realprice);
+            $('#nameold').html(lastcard.cardname);
+        }
+        if (streak != null) {
+            $('#streak').html(streak);
+        }
+    }
+
+    this.init = function (cards) {
+        this.updatevisuals(cards[0], null, null);
+        this.currentcard = cards[0];
+        for (var i = 0; i < cards.length; i++) {
+            q.enqueue(cards[i]);
+            wrap.append("<div class='card'><img alt='" + cards[i].cardname + "' src='" + cards[i].image + "' /><span><strong>" + cards[i].cardname + ", " + cards[i].image + "</strong></span></div>");
+        }
+        q.dequeue();
+    }
+
+    this.cycle = function (newcard, streak) {
+        lastcard = this.currentcard;
+        this.currentcard = q.dequeue();
+        this.updatevisuals(this.currentcard, lastcard, streak);
+        wrap.append("<div class='card'><img alt='" + newcard.cardname + "' src='" + newcard.image + "' /><span><strong>" + newcard.cardname + ", " + newcard.image + "</strong></span></div>");
+        q.enqueue(newcard)
+    }
 };
 
 var App = {
-	yesButton: $('.button.yes .trigger'),
-	noButton: $('.button.no .trigger'),
-	blocked: false,
-	like: function(liked){
-		var animate = liked ? 'animateYes' : 'animateNo';
-		var self = this;
-		if(!this.blocked){
-		  this.blocked = true;
-		  	$('.person').eq(0).addClass(animate).one(animationEndEvent, function(){
-	   			$(this).remove();
-				Person.add();
-				self.blocked = false;
-			});
-		}
-	}
+    yesButton: $('.button.yes .trigger'),
+    noButton: $('.button.no .trigger'),
+    blocked: false,
+    like: function (liked) {
+        this.higher = liked;
+        var animate = liked ? 'animateYes' : 'animateNo';
+        var self = this;
+        if(!this.blocked){
+            this.blocked = true;
+            $('.card').eq(0).addClass(animate).one(animationEndEvent, function(){
+                $(this).remove();
+                $.getJSON($SCRIPT_ROOT + '/newcard', {
+                    higher: self.higher,
+                    currentcard: cs.currentcard
+                }, function (data) {
+                    cs.cycle(data.newcard, data.streak);
+                });
+                self.blocked = false;
+            });
+        }
+    }
 };
 
-var Phone = {
-	wrap: $('#phone'),
-	clock: $('.clock'),
-	updateClock: function(){
-		var date = new Date();
-		var hours = date.getHours();
-		var min = date.getMinutes();
-     hours = (hours < 10 ? "0" : "") + hours;
-		min = (min < 10 ? "0" : "") + min;
-		var str = hours + ":" + min;
-		this.clock.text(str);
-	}
-}
-  
 App.yesButton.on('mousedown', function(){
-	App.like(true);
+    App.like(true);
 });
 
 App.noButton.on('mousedown', function(){
-	App.like(false);
+    App.like(false);
 });
 
+function initcardstack(cards) {
+    var cardsobj = JSON.parse(cards)
+    cs.init(cardsobj);
+};
+
 $(document).ready(function(){
-  Phone.updateClock(); 
-  setInterval('Phone.updateClock()', 1000);
-  Person.add();
-  Person.add();
 });

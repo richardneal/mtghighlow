@@ -15,28 +15,29 @@ class Streak:
             self.beststreak = 0
             self.lastcard = None
 
-    def new_card(self, result):
+    def new_card(self, card, result):
         correct = 0
-
         if result == "Higher":
-            if self.lastcard.fakeprice > self.lastcard.realprice:
+            if card.fakeprice > card.realprice:
                 correct = "WRONG"
                 self.streak = 0
-            elif self.lastcard.fakeprice < self.lastcard.realprice:
+            elif card.fakeprice < card.realprice:
                 correct = "CORRECT"
                 self.streak += 1
         elif result == "Lower":
-            if self.lastcard.fakeprice < self.lastcard.realprice:
+            if card.fakeprice < card.realprice:
                 correct = "WRONG"
                 self.streak = 0
-            elif self.lastcard.fakeprice > self.lastcard.realprice:
+            elif card.fakeprice > card.realprice:
                 correct = "CORRECT"
                 self.streak += 1
+        print self.streak
         if self.beststreak < self.streak:
             self.beststreak = self.streak
         card = random.choice(self.cards)
+
         self.currentcard = Card(card[0], card[1])
-        return correct
+        return self.currentcard
 
 class Card:
     def __init__(self, cardset, cardname, realprice=None, fakeprice=None):
@@ -45,15 +46,15 @@ class Card:
         if realprice:
             self.realprice = realprice
         else:
-            self.realprice = getCFBPrice(cardname, cardset)[0]
+            try:
+                self.realprice = float(getCFBPrice(cardname, cardset)[0])
+            except:
+                self.realprice = -1.0
 
         if fakeprice:
             self.fakeprice = fakeprice
         else:
-            try:
-                fakepricefloat = float(self.realprice)*(1 + .01 * random.randrange(-90,100))
-            except:
-                fakepricefloat = -1.0
+            fakepricefloat = float(self.realprice)*(1 + .01 * random.randrange(-90,100))
             self.fakeprice = '{:0,.2f}'.format(fakepricefloat)
 
 

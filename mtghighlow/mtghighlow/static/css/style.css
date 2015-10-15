@@ -90,17 +90,17 @@ body {
 	text-align: right;
 }
 
-#people, .person {
+#cards, .card {
   width: 312px;
   height: 445px;
 }
 
-#people {
+#cards {
   position: relative;
   margin: 0 auto;
 }
 
-.person {
+.card {
   position: absolute;
   background-color: transparent;
   border-radius: 10px;
@@ -109,11 +109,20 @@ body {
   border: 1px solid rgba(0, 0, 0, 0.2);
   transition: all .1s linear;
 }
-.person:nth-child(1) {
+.card:nth-child(1) {
   z-index: 5;
 }
+.card:nth-child(2) {
+  z-index: 4;
+}
+.card:nth-child(3) {
+  z-index: 3;
+}
+.card:nth-child(n+4) {
+  z-index: 2;
+}
 
-.person:before {
+.card:before {
   position: absolute;
   top: 0;
   left: 0;
@@ -123,12 +132,12 @@ body {
   content: '';
 }
 
-.person img {
+.card img {
   height: 100%;
   background: black;
 }
 
-.person span {
+.card span {
   position: absolute;
   bottom: 0;
   left: 0;
@@ -141,7 +150,7 @@ body {
   opacity: .6;
 }
 
-.person span strong {
+.card span strong {
   font-weight: 600;
   color: #FFF;
   opacity: 1;
