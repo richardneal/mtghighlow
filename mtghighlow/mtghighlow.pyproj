@@ -43,35 +43,18 @@
   <ItemGroup>
     <Folder Include="mtghighlow\" />
     <Folder Include="mtghighlow\static\" />
-    <Folder Include="mtghighlow\static\content\" />
-    <Folder Include="mtghighlow\static\fonts\" />
-    <Folder Include="mtghighlow\static\scripts\" />
+    <Folder Include="mtghighlow\static\css\" />
+    <Folder Include="mtghighlow\static\img\" />
+    <Folder Include="mtghighlow\static\js\" />
     <Folder Include="mtghighlow\templates\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="mtghighlow\static\css\style.css" />
+    <Content Include="mtghighlow\static\img\higher.png" />
+    <Content Include="mtghighlow\static\img\lower.png" />
+    <Content Include="mtghighlow\static\js\index.js" />
+    <Content Include="mtghighlow\static\js\prefixfree.min.js" />
     <Content Include="requirements.txt" />
-    <Content Include="mtghighlow\static\content\bootstrap.css" />
-    <Content Include="mtghighlow\static\content\bootstrap.min.css" />
-    <Content Include="mtghighlow\static\content\site.css" />
-    <Content Include="mtghighlow\static\fonts\glyphicons-halflings-regular.eot" />
-    <Content Include="mtghighlow\static\fonts\glyphicons-halflings-regular.svg" />
-    <Content Include="mtghighlow\static\fonts\glyphicons-halflings-regular.ttf" />
-    <Content Include="mtghighlow\static\fonts\glyphicons-halflings-regular.woff" />
-    <Content Include="mtghighlow\static\scripts\bootstrap.js" />
-    <Content Include="mtghighlow\static\scripts\bootstrap.min.js" />
-    <Content Include="mtghighlow\static\scripts\jquery-1.10.2.intellisense.js" />
-    <Content Include="mtghighlow\static\scripts\jquery-1.10.2.js" />
-    <Content Include="mtghighlow\static\scripts\jquery-1.10.2.min.js" />
-    <Content Include="mtghighlow\static\scripts\jquery-1.10.2.min.map" />
-    <Content Include="mtghighlow\static\scripts\jquery.validate-vsdoc.js" />
-    <Content Include="mtghighlow\static\scripts\jquery.validate.js" />
-    <Content Include="mtghighlow\static\scripts\jquery.validate.min.js" />
-    <Content Include="mtghighlow\static\scripts\jquery.validate.unobtrusive.js" />
-    <Content Include="mtghighlow\static\scripts\jquery.validate.unobtrusive.min.js" />
-    <Content Include="mtghighlow\static\scripts\modernizr-2.6.2.js" />
-    <Content Include="mtghighlow\static\scripts\respond.js" />
-    <Content Include="mtghighlow\static\scripts\respond.min.js" />
-    <Content Include="mtghighlow\static\scripts\_references.js" />
     <Content Include="mtghighlow\templates\index.html" />
   </ItemGroup>
   <ItemGroup>
