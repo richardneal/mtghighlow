@@ -25,13 +25,13 @@ function CardStack() {
     this.init = function (cards) {
         this.updatevisuals(null, cards[0]);
         for (var i = 0; i < cards.length; i++) {
-            wrap.append("<div class='card'><img alt='" + cards[i].cardname + "' src='" + cards[i].image + "' /><span><strong>" + cards[i].cardname + ", " + cards[i].image + "</strong></span></div>");
+            wrap.append("<div class='card'><img alt='" + cards[i].cardname + "' src='" + cards[i].image + "' /><span><strong>" + cards[i].cardname + ", " + cards[i].cardset + "</strong></span></div>");
         }
     }
 
     this.cycle = function (newcard, streak, currentcard) {
         this.updatevisuals(streak, currentcard);
-        wrap.append("<div class='card'><img alt='" + newcard.cardname + "' src='" + newcard.image + "' /><span><strong>" + newcard.cardname + ", " + newcard.image + "</strong></span></div>");
+        wrap.append("<div class='card'><img alt='" + newcard.cardname + "' src='" + newcard.image + "' /><span><strong>" + newcard.cardname + ", " + newcard.cardset + "</strong></span></div>");
     }
 };
 
@@ -67,7 +67,7 @@ App.noButton.on('mousedown', function(){
 });
 
 function initcardstack(cards) {
-    var cardsobj = JSON.parse(cards)
+    var cardsobj = JSON.parse(cards);
     cs.init(cardsobj);
 };
 
