@@ -5,6 +5,29 @@
 import urllib
 import logging
 
+from bs4 import BeautifulSoup
+
+def getGoldfishFormatCards(format,paper):
+    a=[]
+    goldfishURL = "http://www.mtggoldfish.com/index/" + format
+    htmlFile = urllib.urlopen(goldfishURL)
+    rawHTML = htmlFile.read()
+    soup = BeautifulSoup(rawHTML, "lxml")
+    if not paper:
+        category = soup.find("div","index-price-table-online")
+    else:
+        category = soup.find("div","index-price-table-paper")
+    tablebody = category.find("tbody")
+
+    for card in tablebody.findAll("tr"):
+        a.append([])
+        values = card.findAll("td")
+        for value in values:
+            thestrings = [unicode(s) for s in value.findAll(text=True)]
+            thetext = ''.join(thestrings)
+            a[-1].append(thetext.replace('\n',''))
+    return a
+
 def getGoldfishTopCards():
     goldfishURL = "http://www.mtggoldfish.com/format-staples/standard/full/all"
     htmlFile = urllib.urlopen(goldfishURL)
