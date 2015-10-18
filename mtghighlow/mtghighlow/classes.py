@@ -1,4 +1,4 @@
-﻿from scraper import getCFBPrice, getGoldfishTopCards, getCardImageURL
+﻿from scraper import getCFBPrice, getGoldfishTopCards, getCardImageURL, getGoldfishFormatCards
 import random
 
 class Streak:
@@ -15,9 +15,11 @@ class Streak:
                     self.q.pop(0)
         except Exception as e:
             print str(e)
-            self.allcards = getGoldfishTopCards()
+            self.allcards = getGoldfishFormatCards("modern", True)
             self.streak = 0
             self.beststreak = 0
+
+            print "done"
 
     def new_card(self, result = None):
         correct = 0
@@ -45,7 +47,7 @@ class Streak:
             self.beststreak = self.streak
 
         new = random.choice(self.allcards)
-        newcard = Card(new[0], new[1])
+        newcard = Card(cardname=new[0], cardset=new[1], realprice=new[2])
         self.q.append(newcard)
 
         return self.q[0], newcard
@@ -71,4 +73,4 @@ class Card:
         if image:
             self.image = image
         else:
-            self.image = getCardImageURL(cardname, None)[0]
+            self.image = getCardImageURL(cardname, cardset)[0]

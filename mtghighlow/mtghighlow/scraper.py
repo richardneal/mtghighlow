@@ -19,13 +19,15 @@ def getGoldfishFormatCards(format,paper):
         category = soup.find("div","index-price-table-paper")
     tablebody = category.find("tbody")
 
-    for card in tablebody.findAll("tr"):
+    for index, card in enumerate(tablebody.findAll("tr")):
         a.append([])
         values = card.findAll("td")
-        for value in values:
+        for value in (values[0], values[1], values[3]):
             thestrings = [unicode(s) for s in value.findAll(text=True)]
             thetext = ''.join(thestrings)
             a[-1].append(thetext.replace('\n',''))
+        if index > 100:
+            break
     return a
 
 def getGoldfishTopCards():
