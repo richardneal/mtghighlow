@@ -5,37 +5,33 @@ var cs = new CardStack();
 
 function CardStack() {
     var wrap = $('#cards');
-    var q = new Queue();
-    var currentcard;
+    var lastcard;
 
-    this.updatevisuals = function (newcard, lastcard, streak) {
-        $('#displayprice').html(newcard.fakeprice);
-        if (lastcard != null) {
-            $('#fakepriceold').html(lastcard.fakeprice);
-            $('#realpriceold').html(lastcard.realprice);
-            $('#nameold').html(lastcard.cardname);
+    this.updatevisuals = function (streak, currentcard) {
+        if (this.lastcard != null) {
+            $('#fakepriceold').html(this.lastcard.fakeprice);
+            $('#realpriceold').html(this.lastcard.realprice);
+            $('#nameold').html(this.lastcard.cardname);
         }
         if (streak != null) {
-            $('#streak').html(streak);
+            $('#score').html(streak);
+        }
+        if (currentcard != null) {
+            $('#displayprice').html(currentcard.fakeprice);
+            this.lastcard = currentcard;
         }
     }
 
     this.init = function (cards) {
-        this.updatevisuals(cards[0], null, null);
-        this.currentcard = cards[0];
+        this.updatevisuals(null, cards[0]);
         for (var i = 0; i < cards.length; i++) {
-            q.enqueue(cards[i]);
             wrap.append("<div class='card'><img alt='" + cards[i].cardname + "' src='" + cards[i].image + "' /><span><strong>" + cards[i].cardname + ", " + cards[i].image + "</strong></span></div>");
         }
-        q.dequeue();
     }
 
-    this.cycle = function (newcard, streak) {
-        lastcard = this.currentcard;
-        this.currentcard = q.dequeue();
-        this.updatevisuals(this.currentcard, lastcard, streak);
+    this.cycle = function (newcard, streak, currentcard) {
+        this.updatevisuals(streak, currentcard);
         wrap.append("<div class='card'><img alt='" + newcard.cardname + "' src='" + newcard.image + "' /><span><strong>" + newcard.cardname + ", " + newcard.image + "</strong></span></div>");
-        q.enqueue(newcard)
     }
 };
 
@@ -53,9 +49,8 @@ var App = {
                 $(this).remove();
                 $.getJSON($SCRIPT_ROOT + '/newcard', {
                     higher: self.higher,
-                    currentcard: cs.currentcard
                 }, function (data) {
-                    cs.cycle(data.newcard, data.streak);
+                    cs.cycle(data.newcard, data.streak, data.currentcard);
                 });
                 self.blocked = false;
             });
