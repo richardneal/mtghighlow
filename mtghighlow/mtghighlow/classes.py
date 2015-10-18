@@ -1,6 +1,5 @@
 ﻿from scraper import getCFBPrice, getGoldfishTopCards, getCardImageURL
 import random
-from Queue import Queue
 
 class Streak:
     def __init__(self, serialized_dict=None):
@@ -49,11 +48,6 @@ class Streak:
         newcard = Card(new[0], new[1])
         self.q.append(newcard)
 
-        #for i in range(len(self.q)):
-        #    print "q[" + str(i) + "]: " + self.q[i].cardname
-
-        #print "currentcard: " + currentcard.cardname if currentcard else "n/a"
-        #print "newcard: " + newcard.cardname
         return self.q[0], newcard
 
 class Card:
