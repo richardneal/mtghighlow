@@ -1,4 +1,4 @@
-﻿from scraper import getCFBPrice, getGoldfishTopCards, getCardImageURL, getGoldfishFormatCards
+﻿from scraper import getGoldfishTopCards, getCardImageURL, getGoldfishFormatCards
 import random
 
 class Streak:
@@ -26,22 +26,35 @@ class Streak:
         currentcard = None
         if result:
             print "result: " + result
-            self.q.pop(0)
             currentcard = self.q[0]
-            if result == "Higher":
-                if currentcard.fakeprice > currentcard.realprice:
+            try:
+                currentcard.fakeprice = float(currentcard.fakeprice)
+                currentcard.realprice = float(currentcard.realprice)
+            except:
+                currentcard.realprice = -1.0
+                currentcard.fakeprice = -1.0
+            self.q.pop(0)
+            if currentcard.fakeprice > currentcard.realprice:
+                if result == "Higher":
                     correct = "WRONG"
+                    print "WRONG: You Selected Higher, and the Fake Price: " + str(currentcard.fakeprice) + " was greater than Real Price: " + str(currentcard.realprice)
                     self.streak = 0
-                elif currentcard.fakeprice < currentcard.realprice:
+                elif result == "Lower":
                     correct = "CORRECT"
+                    print "Correct: You Selected Lower, and the Fake Price: " + str(currentcard.fakeprice) + " was Greater than Real Price: " + str(currentcard.realprice)
                     self.streak += 1
-            elif result == "Lower":
-                if currentcard.fakeprice < currentcard.realprice:
+            if currentcard.fakeprice < currentcard.realprice:
+                if result == "Lower":
                     correct = "WRONG"
+                    print "WRONG: You Selected Lower, and the Fake Price: " + str(currentcard.fakeprice) + " was Lower than Real Price: " + str(currentcard.realprice)
                     self.streak = 0
-                elif currentcard.fakeprice > currentcard.realprice:
+                elif result == "Higher":
                     correct = "CORRECT"
+                    print "Correct: You Selected Higher, and the Fake Price: " + str(currentcard.fakeprice) + " was less than Real Price: " + str(currentcard.realprice)
                     self.streak += 1
+            if currentcard.fakeprice == -1.0 or currentcard.realprice == -1.0:
+                correct = "ERROR"
+                print "There was an error, your streak should be unaffected."
         print self.streak
         if self.beststreak < self.streak:
             self.beststreak = self.streak
