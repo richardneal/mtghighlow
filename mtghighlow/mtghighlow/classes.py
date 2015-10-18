@@ -3,44 +3,55 @@ import random
 
 class Streak:
     def __init__(self, serialized_dict=None):
-        if serialized_dict:
-            self.cards = serialized_dict['cards']
-            self.lastcard = Card(serialized_dict['currentcard']['cardset'], serialized_dict['currentcard']['cardname'], serialized_dict['currentcard']['realprice'], serialized_dict['currentcard']['fakeprice'])
+        self.maxlength = 5
+        self.q = []
+        try:
+            self.allcards = serialized_dict['allcards']
             self.streak = serialized_dict['streak']
             self.beststreak = serialized_dict['beststreak']
-        else:
-            self.cards = getGoldfishTopCards()
-            self.currentcard = None
+            for elem in serialized_dict['queue']:
+                self.q.append(Card(elem["cardset"], elem["cardname"], elem["realprice"], elem["fakeprice"], elem["image"]))
+                if len(self.q) > self.maxlength:
+                    self.q.pop(0)
+        except Exception as e:
+            print str(e)
+            self.allcards = getGoldfishTopCards()
             self.streak = 0
             self.beststreak = 0
-            self.lastcard = None
 
-    def new_card(self, card, result):
+    def new_card(self, result = None):
         correct = 0
-        if result == "Higher":
-            if card.fakeprice > card.realprice:
-                correct = "WRONG"
-                self.streak = 0
-            elif card.fakeprice < card.realprice:
-                correct = "CORRECT"
-                self.streak += 1
-        elif result == "Lower":
-            if card.fakeprice < card.realprice:
-                correct = "WRONG"
-                self.streak = 0
-            elif card.fakeprice > card.realprice:
-                correct = "CORRECT"
-                self.streak += 1
+        currentcard = None
+        if result:
+            print "result: " + result
+            self.q.pop(0)
+            currentcard = self.q[0]
+            if result == "Higher":
+                if currentcard.fakeprice > currentcard.realprice:
+                    correct = "WRONG"
+                    self.streak = 0
+                elif currentcard.fakeprice < currentcard.realprice:
+                    correct = "CORRECT"
+                    self.streak += 1
+            elif result == "Lower":
+                if currentcard.fakeprice < currentcard.realprice:
+                    correct = "WRONG"
+                    self.streak = 0
+                elif currentcard.fakeprice > currentcard.realprice:
+                    correct = "CORRECT"
+                    self.streak += 1
         print self.streak
         if self.beststreak < self.streak:
             self.beststreak = self.streak
-        card = random.choice(self.cards)
 
-        self.currentcard = Card(card[0], card[1])
-        return self.currentcard
+        new = random.choice(self.allcards)
+        newcard = Card(new[0], new[1])
+        self.q.append(newcard)
+
+        return self.q[0], newcard
 
 class Card:
-    def __init__(self, cardset, cardname, realprice=None, fakeprice=None):
+    def __init__(self, cardset, cardname, realprice=None, fakeprice=None, image=None):
         self.cardset = cardset
         self.cardname = cardname
         if realprice:
@@ -57,5 +68,7 @@ class Card:
             fakepricefloat = float(self.realprice)*(1 + .01 * random.randrange(-90,100))
             self.fakeprice = '{:0,.2f}'.format(fakepricefloat)
 
-
-        self.image = getCardImageURL(cardname, None)[0]
+        if image:
+            self.image = image
+        else:
+            self.image = getCardImageURL(cardname, None)[0]

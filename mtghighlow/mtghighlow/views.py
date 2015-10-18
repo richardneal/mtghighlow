@@ -6,10 +6,10 @@ class MyJSONEncoder(JSONEncoder):
     def default(self, obj):
         if isinstance(obj, classes.Streak):
             return {
-                'cards': obj.cards, 
-                'currentcard': obj.currentcard,
+                'allcards': obj.allcards, 
                 'streak': obj.streak,
                 'beststreak': obj.beststreak,
+                'queue': obj.q,
             }
         elif isinstance(obj, classes.Card):
             return {
@@ -26,7 +26,6 @@ app.json_encoder = MyJSONEncoder
 
 @app.route('/', methods=['GET'])
 def index():
-    result = 'None'
     if request.method == 'POST':
         if 'higherbutton' in request.form.keys():
             result = 'Higher'
@@ -37,13 +36,11 @@ def index():
     else:
         streak = classes.Streak(g.streak)
         
-    correct = streak.new_card(result, None)
     g.streak = streak
 
     cardlist = []
-    for i in range(4):
-        streak.new_card(False, None)
-        cardlist.append(streak.currentcard)
+    for i in range(streak.maxlength):
+        cardlist.append(streak.new_card()[1])
 
     if request.method == 'GET':
         #return render_template('index.html', nameold=streak.lastcard.cardname, namenew=streak.currentcard.cardname, result=result, imageurl=streak.currentcard.image, streak=streak.streak, realpriceold=streak.lastcard.realprice, fakepriceold=streak.lastcard.fakeprice, fakepricenew=streak.currentcard.fakeprice, correct=correct, beststreak=streak.beststreak)
@@ -65,8 +62,8 @@ def serialize_streak(response):
 
 @app.route('/newcard')
 def newcard():
-    currentcard = classes.Card(request.args['currentcard[cardset]'], request.args['currentcard[cardname]'], request.args['currentcard[realprice]'], request.args['currentcard[fakeprice]'])
     higher = "Higher" if request.args.get('higher') == 'true' else "Lower"
     streak = classes.Streak(g.streak)
-    streak.new_card(currentcard, higher)
-    return jsonify({"newcard":streak.currentcard, "streak":streak.streak})
+    currentcard, newcard = streak.new_card(higher)
+    g.streak = streak
+    return jsonify({"newcard":newcard, "streak":streak.streak, "currentcard":currentcard})
