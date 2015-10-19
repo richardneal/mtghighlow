@@ -41,7 +41,7 @@ def index():
 def newcard():
     higher = "Higher" if request.args.get('higher') == 'true' else "Lower"
     streak = classes.Streak(session["streak"])
-    currentcard, newcard, beststreak = streak.new_card(higher)
+    currentcard, newcard, beststreak, correct = streak.new_card(higher)
     print 'Best Streak = ' + str(beststreak)
     session["streak"] = streak
-    return jsonify({"newcard":newcard, "streak":streak.streak, "currentcard":currentcard, "beststreak":beststreak})
+    return jsonify({"newcard":newcard, "streak":streak.streak, "currentcard":currentcard, "beststreak":beststreak, "correct":correct})

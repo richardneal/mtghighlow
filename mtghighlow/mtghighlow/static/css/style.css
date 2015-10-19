@@ -43,11 +43,19 @@ body {
 	float:left;
 }
 #app .header .top .result {
-  color:#0A0;
   text-align: left;
   float:left;
   width: 165px;
 }
+
+#app .header .top .correct {
+    color:#3b7;
+}
+
+#app .header .top .wrong {
+    color:#c33;
+}
+
 #app .header .top .score {
 	font-size:20px;
   color:#777;

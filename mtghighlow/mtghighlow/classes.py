@@ -36,20 +36,20 @@ class Streak:
             self.q.pop(0)
             if currentcard.fakeprice > currentcard.realprice:
                 if result == "Higher":
-                    correct = "WRONG"
+                    correct = False
                     print "WRONG: You Selected Higher, and the Fake Price: " + str(currentcard.fakeprice) + " was greater than Real Price: " + str(currentcard.realprice)
                     self.streak = 0
                 elif result == "Lower":
-                    correct = "CORRECT"
+                    correct = True
                     print "Correct: You Selected Lower, and the Fake Price: " + str(currentcard.fakeprice) + " was Greater than Real Price: " + str(currentcard.realprice)
                     self.streak += 1
             if currentcard.fakeprice < currentcard.realprice:
                 if result == "Lower":
-                    correct = "WRONG"
+                    correct = False
                     print "WRONG: You Selected Lower, and the Fake Price: " + str(currentcard.fakeprice) + " was Lower than Real Price: " + str(currentcard.realprice)
                     self.streak = 0
                 elif result == "Higher":
-                    correct = "CORRECT"
+                    correct = True
                     print "Correct: You Selected Higher, and the Fake Price: " + str(currentcard.fakeprice) + " was less than Real Price: " + str(currentcard.realprice)
                     self.streak += 1
             if currentcard.fakeprice == -1.0 or currentcard.realprice == -1.0:
@@ -64,7 +64,7 @@ class Streak:
         newcard = Card(cardname=new[0], cardset=new[1], realprice=new[2])
         self.q.append(newcard)
 
-        return self.q[0], newcard, self.beststreak
+        return self.q[0], newcard, self.beststreak, correct
 
 class Card:
     def __init__(self, cardset, cardname, realprice=None, fakeprice=None, image=None):
