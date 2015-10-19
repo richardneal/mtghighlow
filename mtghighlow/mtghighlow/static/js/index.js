@@ -7,13 +7,14 @@ function CardStack() {
     var wrap = $('#cards');
     var lastcard;
 
-    this.updatevisuals = function (streak, currentcard) {
+    this.updatevisuals = function (streak, currentcard, beststreak) {
         if (this.lastcard != null) {
             $('#fakepriceold').html('$' + this.lastcard.fakeprice);
             $('#realpriceold').html('$' + this.lastcard.realprice);
             if ((this.lastcard.cardname).length > 17)
                 this.lastcard.cardname = (this.lastcard.cardname).substring(0, 17) + '...';
             $('#nameold').html(this.lastcard.cardname);
+            $('#beststreak').html('TOP: ' + beststreak)
         }
         if (streak != null) {
             $('#score').html(streak);
@@ -31,8 +32,8 @@ function CardStack() {
         }
     }
 
-    this.cycle = function (newcard, streak, currentcard) {
-        this.updatevisuals(streak, currentcard);
+    this.cycle = function (newcard, streak, currentcard, beststreak) {
+        this.updatevisuals(streak, currentcard, beststreak);
         wrap.append("<div class='card'><img alt='" + newcard.cardname + "' src='" + newcard.image + "' /><span><strong>" + newcard.cardname + ", " + newcard.cardset + "</strong></span></div>");
     }
 };
@@ -52,7 +53,7 @@ var App = {
                 $.getJSON($SCRIPT_ROOT + '/newcard', {
                     higher: self.higher,
                 }, function (data) {
-                    cs.cycle(data.newcard, data.streak, data.currentcard);
+                    cs.cycle(data.newcard, data.streak, data.currentcard, data.beststreak);
                 });
                 self.blocked = false;
             });

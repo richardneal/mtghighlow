@@ -58,12 +58,13 @@ class Streak:
         print self.streak
         if self.beststreak < self.streak:
             self.beststreak = self.streak
+        print self.beststreak
 
         new = random.choice(self.allcards)
         newcard = Card(cardname=new[0], cardset=new[1], realprice=new[2])
         self.q.append(newcard)
 
-        return self.q[0], newcard
+        return self.q[0], newcard, self.beststreak
 
 class Card:
     def __init__(self, cardset, cardname, realprice=None, fakeprice=None, image=None):
