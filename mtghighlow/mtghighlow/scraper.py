@@ -25,8 +25,8 @@ def getGoldfishFormatCards(format,paper):
         for value in (values[0], values[1], values[3]):
             thestrings = [unicode(s) for s in value.findAll(text=True)]
             thetext = ''.join(thestrings)
-            thetext.replace('\n','')
-            thetext.replace('PRM-GPP','GPX')
+            thetext = thetext.replace('\n','')
+            thetext = thetext.replace('PRM-GPP','GPX')
             a[-1].append(thetext)
         if index > 100:
             break
