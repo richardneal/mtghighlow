@@ -9,15 +9,17 @@ function CardStack() {
 
     this.updatevisuals = function (streak, currentcard) {
         if (this.lastcard != null) {
-            $('#fakepriceold').html(this.lastcard.fakeprice);
-            $('#realpriceold').html(this.lastcard.realprice);
+            $('#fakepriceold').html('$' + this.lastcard.fakeprice);
+            $('#realpriceold').html('$' + this.lastcard.realprice);
+            if ((this.lastcard.cardname).length > 17)
+                this.lastcard.cardname = (this.lastcard.cardname).substring(0, 17) + '...';
             $('#nameold').html(this.lastcard.cardname);
         }
         if (streak != null) {
             $('#score').html(streak);
         }
         if (currentcard != null) {
-            $('#displayprice').html(currentcard.fakeprice);
+            $('#displayprice').html('$' + currentcard.fakeprice);
             this.lastcard = currentcard;
         }
     }
