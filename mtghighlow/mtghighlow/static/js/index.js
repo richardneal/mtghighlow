@@ -58,12 +58,20 @@ var App = {
     }
 };
 
-App.yesButton.on('mousedown', function(){
+App.yesButton.on('click', function(){
     App.like(true);
 });
 
-App.noButton.on('mousedown', function(){
+App.noButton.on('click', function(){
     App.like(false);
+});
+
+$(document).keydown(function(e) {
+    if(e.which == 39){
+        App.like(true);
+    } else if (e.which == 37){
+        App.like(false);
+    }
 });
 
 function initcardstack(cards) {
