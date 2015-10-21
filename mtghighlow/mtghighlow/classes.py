@@ -26,14 +26,13 @@ class Streak:
         currentcard = None
         if result:
             print "result: " + result
-            currentcard = self.q[0]
+            currentcard = self.q.pop(0)
             try:
                 currentcard.fakeprice = float(currentcard.fakeprice)
                 currentcard.realprice = float(currentcard.realprice)
             except:
                 currentcard.realprice = -1.0
                 currentcard.fakeprice = -1.0
-            self.q.pop(0)
             if currentcard.fakeprice > currentcard.realprice:
                 if result == "Higher":
                     correct = False
@@ -60,16 +59,19 @@ class Streak:
             self.beststreak = self.streak
         print self.beststreak
 
-        new = random.choice(self.allcards)
-        newcard = Card(cardname=new[0], cardset=new[1], realprice=new[2])
-        self.q.append(newcard)
+        bottom = random.choice(self.allcards)
+        bottomcard = Card(cardname=bottom[0], cardset=bottom[1], realprice=bottom[2])
+        self.q.append(bottomcard)
 
-        return self.q[0], newcard, self.beststreak, correct
+        self.q[0].getfakeprice(self.streak)
+
+        return self.q[0], bottomcard, self.beststreak, correct
 
 class Card:
-    def __init__(self, cardset, cardname, realprice=None, fakeprice=None, image=None):
+    def __init__(self, cardset, cardname, realprice=0, fakeprice=0, image=None):
         self.cardset = cardset
         self.cardname = cardname
+
         if realprice:
             self.realprice = realprice
         else:
@@ -81,10 +83,15 @@ class Card:
         if fakeprice:
             self.fakeprice = fakeprice
         else:
-            fakepricefloat = float(self.realprice)*(1 + .01 * random.randrange(-90,100))
-            self.fakeprice = '{:0,.2f}'.format(fakepricefloat)
+            self.getfakeprice(1)
 
         if image:
             self.image = image
         else:
             self.image = getCardImageURL(cardname, cardset)[0]
+
+    def getfakeprice(self, streak):
+        multiplier = 1 + random.uniform((-0.985**streak), (0.985**streak))
+        fakepricefloat = float(self.realprice) * multiplier
+        self.fakeprice = '{:0,.2f}'.format(fakepricefloat)
+

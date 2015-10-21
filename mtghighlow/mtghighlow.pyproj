@@ -54,7 +54,6 @@
     <Content Include="mtghighlow\static\img\lower.png" />
     <Content Include="mtghighlow\static\js\index.js" />
     <Content Include="mtghighlow\static\js\prefixfree.min.js" />
-    <Content Include="mtghighlow\static\js\Queue.js" />
     <Content Include="requirements.txt" />
     <Content Include="mtghighlow\templates\index.html" />
   </ItemGroup>

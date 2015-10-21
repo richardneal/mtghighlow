@@ -17,6 +17,8 @@ function CardStack() {
         }
         if (streak != null) {
             $('#score').html(streak);
+        }
+        if (beststreak != null) {
             $('#beststreak').html('TOP: ' + beststreak)
         }
         if (currentcard != null) {
@@ -24,6 +26,7 @@ function CardStack() {
             this.lastcard = currentcard;
         }
         if (correct != null) {
+            $('#correct').removeClass('title')
             if (correct) {
                 $('#correct').html('CORRECT');
                 $('#correct').removeClass('wrong').addClass('correct')

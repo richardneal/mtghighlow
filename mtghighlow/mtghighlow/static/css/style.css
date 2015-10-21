@@ -56,6 +56,10 @@ body {
     color:#c33;
 }
 
+#app .header .top .title {
+    color:#777;
+}
+
 #app .header .top .score {
 	font-size:20px;
   color:#777;

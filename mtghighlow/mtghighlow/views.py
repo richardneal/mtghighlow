@@ -35,7 +35,7 @@ def index():
     for i in range(streak.maxlength):
         cardlist.append(streak.new_card()[1])
     session["streak"] = streak
-    return render_template('index.html', cards=cardlist)
+    return render_template('index.html', cards=cardlist, beststreak=streak.beststreak, streak=streak.streak)
 
 @app.route('/newcard')
 def newcard():
