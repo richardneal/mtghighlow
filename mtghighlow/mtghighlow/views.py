@@ -39,9 +39,14 @@ def index():
 
 @app.route('/newcard')
 def newcard():
-    higher = "Higher" if request.args.get('higher') == 'true' else "Lower"
+    print request.args
+    #we didnt have a try here before, and i havent had any issues, but it feels like we need a try here...
+    try:
+        choice = request.args.get('choice')
+    except:
+        choice = "error"
     streak = classes.Streak(session["streak"])
-    currentcard, newcard, beststreak, correct = streak.new_card(higher)
+    currentcard, newcard, beststreak, correct = streak.new_card(choice)
     print 'Best Streak = ' + str(beststreak)
     session["streak"] = streak
     return jsonify({"newcard":newcard, "streak":streak.streak, "currentcard":currentcard, "beststreak":beststreak, "correct":correct})

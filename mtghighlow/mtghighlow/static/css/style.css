@@ -56,6 +56,10 @@ body {
     color:#c33;
 }
 
+#app .header .top .lucky {
+    color:#b3b;
+}
+
 #app .header .top .title {
     color:#777;
 }
@@ -193,7 +197,7 @@ body {
 
 @keyframes no {
   0% {
-    transform: rotateZ(360deg);
+    transform: scale(1) rotateZ(360deg);
     right: 0;
   }
   30% {
@@ -214,6 +218,26 @@ body {
   background: url(../img/lower.png) no-repeat center 30px;
 }
 
+@keyframes lucky {
+  0% {
+    top: 0;
+  }
+  30% {
+    transform: scale(1.05);
+    top: 0;
+  }
+  100% {
+    top: -600px;
+  }
+}
+.animateLucky {
+  animation-fill-mode: both;
+  animation: lucky 0.6s linear;
+}
+.animateLucky:before {
+  background: url(../img/lucky.png) no-repeat center 30px;
+}
+
 #control {
   position: relative;
   margin: 15px auto 0;
@@ -227,6 +251,12 @@ body {
   top: 5px;
   border-radius: 50%;
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+#control .button .display {
+    border: 0;
+    background: none;
+    outline: 0;
+    width: inherit;
 }
 #control .button .trigger {
   background: white;
@@ -242,6 +272,7 @@ body {
   text-align: center;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
 }
+
 #control .button .trigger:active {
   transform: translateY(-50%) scale(0.75);
   transition: all .05s linear;
@@ -270,7 +301,7 @@ body {
   color: #3b7;
 }
 #control .info {
-	border-radius: 10px;
+	border-radius: 0px;
   left: calc(50% - 100px);
   top: 7px;
   height: 60px;

@@ -7,7 +7,7 @@ function CardStack() {
     var wrap = $('#cards');
     var lastcard;
 
-    this.updatevisuals = function (streak, currentcard, beststreak, correct) {
+    this.updatevisuals = function (streak, currentcard, beststreak, result) {
         if (this.lastcard != null) {
             $('#fakepriceold').html('$' + this.lastcard.fakeprice);
             $('#realpriceold').html('$' + this.lastcard.realprice);
@@ -25,14 +25,26 @@ function CardStack() {
             $('#displayprice').html('$' + currentcard.fakeprice);
             this.lastcard = currentcard;
         }
-        if (correct != null) {
+        if (result != null) {
             $('#correct').removeClass('title')
-            if (correct) {
+            if (result == 'correct') {
                 $('#correct').html('CORRECT');
-                $('#correct').removeClass('wrong').addClass('correct')
-            } else {
+                $('#correct').removeClass('wrong').removeClass('lucky').addClass('correct')
+            } else if (result == 'wrong') {
                 $('#correct').html('WRONG');
-                $('#correct').removeClass('correct').addClass('wrong')
+                $('#correct').removeClass('correct').removeClass('lucky').addClass('wrong')
+            } else if (result == 'lucky') {
+                $('#correct').html('LUCKY')
+                $('#correct').removeClass('wrong').removeClass('correct').addClass('lucky')
+            } else if (result == 'notlucky') {
+                $('#correct').html('NOT LUCKY')
+                $('#correct').removeClass('correct').removeClass('lucky').addClass('wrong')
+            } else if (result == 'tricked') {
+                $('#correct').html('TRICKED')
+                $('#correct').removeClass('wrong').removeClass('correct').addClass('lucky')
+            } else if (result == 'error') {
+                $('#correct').html('ERROR')
+                $('#correct').removeClass('correct').removeClass('wrong').removeClass('lucky')
             }
         }
     }
@@ -53,17 +65,25 @@ function CardStack() {
 var App = {
     yesButton: $('.button.yes .trigger'),
     noButton: $('.button.no .trigger'),
+    luckyButton: $('.button.info .display'),
     blocked: false,
     like: function (liked) {
-        this.higher = liked;
-        var animate = liked ? 'animateYes' : 'animateNo';
+        this.choice = liked;
+        var animate = null
+        if (liked == 'higher') {
+            animate = 'animateYes';
+        } else if (liked == 'lower') {
+            animate = 'animateNo';
+        } else if (liked = 'lucky') {
+            animate = 'animateLucky'
+        }
         var self = this;
         if(!this.blocked){
             this.blocked = true;
             $('.card').eq(0).addClass(animate).one(animationEndEvent, function(){
                 $(this).remove();
                 $.getJSON($SCRIPT_ROOT + '/newcard', {
-                    higher: self.higher,
+                    choice: self.choice,
                 }, function (data) {
                     cs.cycle(data.newcard, data.streak, data.currentcard, data.beststreak, data.correct);
                 });
@@ -74,12 +94,16 @@ var App = {
 };
 
 App.yesButton.on('click', function(){
-    App.like(true);
+    App.like('higher');
 });
 
 App.noButton.on('click', function(){
-    App.like(false);
+    App.like('lower');
 });
+
+App.luckyButton.on('click', function () {
+    App.like('lucky')
+})
 
 $(document).keydown(function(e) {
     if(e.which == 39){

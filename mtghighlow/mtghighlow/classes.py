@@ -21,11 +21,11 @@ class Streak:
 
             print "done"
 
-    def new_card(self, result = None):
-        correct = 0
+    def new_card(self, choice = None):
+        result = 0
         currentcard = None
-        if result:
-            print "result: " + result
+        if choice:
+            print "choice: " + choice
             currentcard = self.q.pop(0)
             try:
                 currentcard.fakeprice = float(currentcard.fakeprice)
@@ -33,27 +33,50 @@ class Streak:
             except:
                 currentcard.realprice = -1.0
                 currentcard.fakeprice = -1.0
-            if currentcard.fakeprice > currentcard.realprice:
-                if result == "Higher":
-                    correct = False
-                    print "WRONG: You Selected Higher, and the Fake Price: " + str(currentcard.fakeprice) + " was greater than Real Price: " + str(currentcard.realprice)
-                    self.streak = 0
-                elif result == "Lower":
-                    correct = True
-                    print "Correct: You Selected Lower, and the Fake Price: " + str(currentcard.fakeprice) + " was Greater than Real Price: " + str(currentcard.realprice)
+            if choice == "error":
+                print "Error in choice! Real Price: "+ str(currentcard.realprice) + " Fake Price: " + str(currentcard.fakeprice)
+            elif abs(currentcard.fakeprice - currentcard.realprice) < .1 and choice == 'lucky':
+                result = 'lucky'
+                print "LUCKY!: You Selected Lucky, and Real Price: " + str(currentcard.realprice) + " was within .10 of Fake Price: " + str(currentcard.fakeprice) + ". +10 Points!"
+                self.streak += 10
+            elif currentcard.fakeprice > currentcard.realprice:
+                if choice == "lower":
+                    result = 'correct'
+                    print "CORRECT: You Selected Lower, and Real Price: " + str(currentcard.realprice) + " was Lower than Fake Price: " + str(currentcard.fakeprice)
                     self.streak += 1
-            if currentcard.fakeprice < currentcard.realprice:
-                if result == "Lower":
-                    correct = False
-                    print "WRONG: You Selected Lower, and the Fake Price: " + str(currentcard.fakeprice) + " was Lower than Real Price: " + str(currentcard.realprice)
+                elif choice == "higher":
+                    result = 'wrong'
+                    print "WRONG: You Selected Higher, and Real Price: " + str(currentcard.realprice) + " was Lower than Fake Price: " + str(currentcard.fakeprice)
                     self.streak = 0
-                elif result == "Higher":
-                    correct = True
-                    print "Correct: You Selected Higher, and the Fake Price: " + str(currentcard.fakeprice) + " was less than Real Price: " + str(currentcard.realprice)
+                elif choice == "lucky":
+                    result = 'notlucky'
+                    print "NOT SO LUCKY: You Selected Lucky, and Real Price: " + str(currentcard.realprice) + " was Lower than Fake Price: " + str(currentcard.fakeprice)
+                    self.streak = 0
+            elif currentcard.fakeprice < currentcard.realprice:
+                if choice == "higher":
+                    result = 'correct'
+                    print "CORRECT: You Selected Higher, and Real Price: " + str(currentcard.realprice) + " was Greater than Fake Price: " + str(currentcard.fakeprice)
                     self.streak += 1
-            if currentcard.fakeprice == -1.0 or currentcard.realprice == -1.0:
-                correct = "ERROR"
-                print "There was an error, your streak should be unaffected."
+                elif choice == "lower":
+                    result = 'wrong'
+                    print "WRONG: You Selected Lower, and Real Price: " + str(currentcard.realprice) + " was Greater than Fake Price: " + str(currentcard.fakeprice)
+                    self.streak = 0
+                elif choice == "lucky":
+                    result = 'notlucky'
+                    print "NOT SO LUCKY: You Selected Lucky, and Real Price: " + str(currentcard.realprice) + " was Greater than Fake Price: " + str(currentcard.fakeprice)
+                    self.streak = 0
+            elif currentcard.fakeprice == currentcard.realprice:
+                if currentcard.fakeprice == -1.0:
+                    result = 'error'
+                    print "There was an error in converting your Real or Fake price, your streak should be unaffected."
+                elif choice == "higher":
+                    result = 'tricked'
+                    print "TRICKED: You Selected Higher, and Real Price: " + str(currentcard.realprice) + " was exactly Fake Price: " + str(currentcard.fakeprice) + ". Streak Unaffected"
+                    self.streak += 0
+                elif choice == "lower":
+                    result = 'tricked'
+                    print "TRICKED: You Selected Lower, and Real Price: " + str(currentcard.realprice) + " was excatly Fake Price: " + str(currentcard.fakeprice) + ". Streak Unaffected"
+                    self.streak += 0
         print self.streak
         if self.beststreak < self.streak:
             self.beststreak = self.streak
@@ -65,7 +88,7 @@ class Streak:
 
         self.q[0].getfakeprice(self.streak)
 
-        return self.q[0], bottomcard, self.beststreak, correct
+        return self.q[0], bottomcard, self.beststreak, result
 
 class Card:
     def __init__(self, cardset, cardname, realprice=0, fakeprice=0, image=None):
@@ -91,7 +114,9 @@ class Card:
             self.image = getCardImageURL(cardname, cardset)[0]
 
     def getfakeprice(self, streak):
-        multiplier = 1 + random.uniform((-0.985**streak), (0.985**streak))
+        #multiplier = 1 + random.uniform((-0.985**streak), (0.985**streak))
+        #The multiplier below can be used to test tricked and lucky scenarios. lower will always be 'tricked' or 'correct', higher will always be 'tricked' or 'wrong' and middle will always be 'lucky' or 'not lucky'
+        multiplier = 1 + random.uniform(0,.005)
         fakepricefloat = float(self.realprice) * multiplier
         self.fakeprice = '{:0,.2f}'.format(fakepricefloat)
 
