@@ -6,6 +6,30 @@ import urllib
 import logging
 
 from bs4 import BeautifulSoup
+import sqlite3
+
+def connect_db():
+    return sqlite3.connect('C:\Users\Richard\Documents\Visual Studio 2015\Projects\mtghighlow\mtghighlow\mtghighlow\db\cards.db')
+
+def goldfishToDB(cardlist):
+    conn = connect_db()
+    c = conn.cursor()
+    c.executescript('drop table if exists cardlist')
+    c.executescript('''create table cardlist
+            (name text, setname text, price real)''')
+    for item in cardlist:
+        c.execute('insert into cardlist values (?,?,?)', item)
+    conn.commit()
+    for row in c.execute('SELECT * FROM cardlist'):
+        print row
+    conn.close()
+
+
+def query_db(query, args=(), one=False):
+    cur = g.db.execute(query, args)
+    rv = [dict((cur.description[idx][0], value)
+               for idx, value in enumerate(row)) for row in cur.fetchall()]
+    return (rv[0] if rv else None) if one else rv
 
 def getGoldfishFormatCards(format,paper):
     a=[]
@@ -32,6 +56,79 @@ def getGoldfishFormatCards(format,paper):
             break
     return a
 
+def getCardlistFromDB():
+    conn = connect_db()
+    c = conn.cursor()
+    cardlist = c.execute('select * from cardlist order by random() limit 100').fetchall()
+    for card in cardlist:
+        print card
+    conn.close()
+    return cardlist;
+    
+def convertSetname(name):
+    if name == u'PRM-CHP':
+        return 'CP'
+    elif name == 'PRM-FNM':
+        return 'FNMP'
+    elif name == 'PRM-GDP' or name == 'PRM-MSC':
+        return 'MGDC'
+    elif name == 'PRM-GWP' or name == 'PRM-WPN':
+        return 'GRC'
+    elif name == 'PRM-GPP':
+        return 'GPX'
+    elif name == 'PRM-JSS':
+        return 'SUS'
+    elif name == 'PRM-JUD':
+        return 'JR'
+    elif name == 'PRM-LPC':
+        return 'MLP'
+    elif name == 'PRM-MPR':
+        return 'MPRP'
+    elif name == 'PRM-MED':
+        return 'MBP'
+    elif name == 'PRM-PRE':
+        return 'PTC'
+    elif name == 'PRM-PTP':
+        return 'PRO'
+    elif name == 'PRM-REL':
+        return 'REP'
+    elif name == 'PRM-SPO':
+        return 'UQC'
+    else:
+        return name
+
+def getGoldfishTotalCards (paper):
+    a = []
+    if paper:
+        goldfishURL = "http://www.mtggoldfish.com/prices/paper/"
+    else:
+        goldfishURL = "http://www.mtggoldfish.com/prices/online/"
+    
+    for format in ['standard', 'modern_two', 'modern_one', 'legacy_two', 'legacy_one', 'special']:
+        htmlFile = urllib.urlopen(goldfishURL+format)
+        rawHTML = htmlFile.read()
+        soup = BeautifulSoup(rawHTML, "html.parser")
+        sets = soup.findAll("div", {"class":"priceList-set"})
+        print len(sets)
+        for set in sets:
+            try:
+                info = []
+                setname = convertSetname(set.find('a', {"class" : "priceList-set-header-link"}, href=True)['href'][7:])
+                print setname
+                cards = [card.find(text=True).strip() for card in set.findAll('dt')]
+                prices = [card.find(text=True).strip().replace(',', '') for card in set.findAll("div", {"class" : "priceList-price-price-wrapper"})]
+                if (len(cards) == len(prices)):
+                    setarray = [setname]*len(cards)
+                    info = zip(cards, setarray, prices)
+                else:
+                    print "There was an error with the card list not matching length of prices"
+
+                a.extend(info)
+            except Exception as e:
+                pass
+
+    goldfishToDB(a)
+
 def getGoldfishTopCards():
     goldfishURL = "http://www.mtggoldfish.com/format-staples/standard/full/all"
     htmlFile = urllib.urlopen(goldfishURL)
@@ -55,8 +152,8 @@ def getCardImageURL(cardName, cardSet):
     if cardSet:
         magicInfoURL += urllib.quote(" e:" + cardSet + "/en")
     htmlFile = urllib.urlopen(magicInfoURL)
-    rawHTML = htmlFile.read()
+    rawHTML = htmlFile.read() # add error handling
     startURLIndex = rawHTML.find("http://magiccards.info/scans")
     endURLIndex = rawHTML.find("\"", startURLIndex)
     imageURL = rawHTML[startURLIndex:endURLIndex]
-    return [imageURL]
+    return imageURL

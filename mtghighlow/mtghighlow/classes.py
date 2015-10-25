@@ -1,4 +1,4 @@
-﻿from scraper import getGoldfishTopCards, getCardImageURL, getGoldfishFormatCards
+﻿from scraper import getGoldfishTopCards, getCardImageURL, getGoldfishFormatCards, getCardlistFromDB
 import random
 
 class Streak:
@@ -15,7 +15,8 @@ class Streak:
                     self.q.pop(0)
         except Exception as e:
             print str(e)
-            self.allcards = getGoldfishFormatCards("modern", True)
+            self.allcards = getCardlistFromDB()
+            print "all cards type is:" + str(type(self.allcards))
             self.streak = 0
             self.beststreak = 0
 
@@ -82,7 +83,10 @@ class Streak:
             self.beststreak = self.streak
         print self.beststreak
 
-        bottom = random.choice(self.allcards)
+        if len(self.allcards) < 10:
+            self.allcards.extend(getCardlistFromDB())
+
+        bottom = self.allcards.pop(0)
         bottomcard = Card(cardname=bottom[0], cardset=bottom[1], realprice=bottom[2])
         self.q.append(bottomcard)
 
@@ -98,6 +102,7 @@ class Card:
         if realprice:
             self.realprice = realprice
         else:
+            #someone made a boo boo
             try:
                 self.realprice = float(getCFBPrice(cardname, cardset)[0])
             except:
@@ -111,7 +116,7 @@ class Card:
         if image:
             self.image = image
         else:
-            self.image = getCardImageURL(cardname, cardset)[0]
+            self.image = getCardImageURL(cardname, cardset)
 
     def getfakeprice(self, streak):
         multiplier = 1 + random.uniform((-0.985**streak), (0.985**streak))

@@ -107,9 +107,11 @@ App.luckyButton.on('click', function () {
 
 $(document).keydown(function(e) {
     if(e.which == 39){
-        App.like(true);
+        App.like('higher');
     } else if (e.which == 37){
-        App.like(false);
+        App.like('lower');
+    } else if (e.which == 38) {
+        App.like('lucky');
     }
 });
 
