@@ -114,9 +114,9 @@ class Card:
             self.image = getCardImageURL(cardname, cardset)[0]
 
     def getfakeprice(self, streak):
-        #multiplier = 1 + random.uniform((-0.985**streak), (0.985**streak))
+        multiplier = 1 + random.uniform((-0.985**streak), (0.985**streak))
         #The multiplier below can be used to test tricked and lucky scenarios. lower will always be 'tricked' or 'correct', higher will always be 'tricked' or 'wrong' and middle will always be 'lucky' or 'not lucky'
-        multiplier = 1 + random.uniform(0,.005)
+        #multiplier = 1 + random.uniform(0,.005)
         fakepricefloat = float(self.realprice) * multiplier
         self.fakeprice = '{:0,.2f}'.format(fakepricefloat)
 

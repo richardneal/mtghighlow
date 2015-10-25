@@ -13,21 +13,21 @@ def getGoldfishFormatCards(format,paper):
     htmlFile = urllib.urlopen(goldfishURL)
     rawHTML = htmlFile.read()
     soup = BeautifulSoup(rawHTML, "lxml")
-    if not paper:
-        category = soup.find("div","index-price-table-online")
-    else:
+    if paper:
         category = soup.find("div","index-price-table-paper")
+    else:
+        category = soup.find("div","index-price-table-online")
     tablebody = category.find("tbody")
 
     for index, card in enumerate(tablebody.findAll("tr")):
-        a.append([])
+        info = []
         values = card.findAll("td")
         for value in (values[0], values[1], values[3]):
-            thestrings = [unicode(s) for s in value.findAll(text=True)]
-            thetext = ''.join(thestrings)
-            thetext = thetext.replace('\n','')
-            thetext = thetext.replace('PRM-GPP','GPX')
-            a[-1].append(thetext)
+            thetext = u''.join(value.findAll(text=True)).strip()
+            if 'PRM-GPP' in thetext:
+                thetext = thetext.replace('PRM-GPP','GPX')
+            info.append(thetext)
+        a.append(info)
         if index > 100:
             break
     return a
