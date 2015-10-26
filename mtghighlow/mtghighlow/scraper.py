@@ -7,9 +7,13 @@ import logging
 
 from bs4 import BeautifulSoup
 import sqlite3
+import os
 
 def connect_db():
-    return sqlite3.connect('C:\Users\Richard\Documents\Visual Studio 2015\Projects\mtghighlow\mtghighlow\mtghighlow\db\cards.db')
+    dir = os.path.dirname(__file__)
+    print str(dir)
+    filename = os.path.join(dir, 'db\cards.db')
+    return sqlite3.connect(filename)
 
 def goldfishToDB(cardlist):
     conn = connect_db()
@@ -156,4 +160,6 @@ def getCardImageURL(cardName, cardSet):
     startURLIndex = rawHTML.find("http://magiccards.info/scans")
     endURLIndex = rawHTML.find("\"", startURLIndex)
     imageURL = rawHTML[startURLIndex:endURLIndex]
+    if imageURL == '':
+        imageURL = ["../static/img/mtgback.jpg"]
     return imageURL
