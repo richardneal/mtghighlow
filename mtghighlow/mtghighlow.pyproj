@@ -20,6 +20,7 @@
     <RootNamespace>mtghighlow</RootNamespace>
     <InterpreterId>{4f0001af-9192-4e34-8623-8da2735f6c24}</InterpreterId>
     <InterpreterVersion>2.7</InterpreterVersion>
+    <NameOfLastUsedPublishProfile>mtghighlow</NameOfLastUsedPublishProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -36,6 +37,7 @@
     <Compile Include="mtghighlow\scraper.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ptvs_virtualenv_proxy.py" />
     <Compile Include="runserver.py" />
     <Compile Include="mtghighlow\__init__.py" />
     <Compile Include="mtghighlow\views.py" />
@@ -49,6 +51,10 @@
     <Folder Include="mtghighlow\templates\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="mtghighlow.pubxml.user" />
+    <Content Include="web.config" />
+    <None Include="web.debug.config" />
+    <None Include="mtghighlow.pubxml" />
     <Content Include="mtghighlow\static\css\style.css" />
     <Content Include="mtghighlow\static\img\higher.png" />
     <Content Include="mtghighlow\static\img\lower.png" />
