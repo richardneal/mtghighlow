@@ -2,13 +2,12 @@
 This script runs the mtghighlow application using a development server.
 """
 
-from os import environ
+from os import environ, path
 from mtghighlow import app
-import os
-basedir = os.path.abspath(os.path.dirname(__file__))
+basedir = path.abspath(os.path.dirname(__file__))
 
-SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'app.db')
-SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
+SQLALCHEMY_DATABASE_URI = 'sqlite:///' + path.join(basedir, 'app.db')
+SQLALCHEMY_MIGRATE_REPO = path.join(basedir, 'db_repository')
 
 if __name__ == '__main__':
     HOST = environ.get('SERVER_HOST', 'localhost')

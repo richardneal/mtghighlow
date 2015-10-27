@@ -1,4 +1,4 @@
-﻿from scraper import getGoldfishTopCards, getCardImageURL, getGoldfishFormatCards, getCardlistFromDB
+﻿from scraper import getCardImageURL, getCardlistFromDB
 import random
 
 class Streak:
@@ -102,11 +102,7 @@ class Card:
         if realprice:
             self.realprice = realprice
         else:
-            #someone made a boo boo
-            try:
-                self.realprice = float(getCFBPrice(cardname, cardset)[0])
-            except:
-                self.realprice = -1.0
+            self.realprice = -1.0
 
         if fakeprice:
             self.fakeprice = fakeprice
