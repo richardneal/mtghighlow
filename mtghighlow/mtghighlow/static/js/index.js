@@ -52,7 +52,7 @@ function CardStack() {
     this.init = function (cards) {
         this.updatevisuals(null, cards[0]);
         for (var i = 0; i < cards.length; i++) {
-            wrap.append("<div class='card'><img alt='" + cards[i].cardname + "' src='" + cards[i].image + "' /><span><strong>" + cards[i].cardname + ", " + cards[i].cardset + "</strong></span></div>");
+            wrap.append("<div class='card'><img alt='" + cards[i].cardname + "' src='" + cards[i].image + "' /><span>" + cards[i].cardname + ", " + cards[i].cardset + "</span></div>");
         }
     }
 
