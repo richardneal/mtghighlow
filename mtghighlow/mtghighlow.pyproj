@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="mtghighlow\" />
+    <Folder Include="mtghighlow\db\" />
     <Folder Include="mtghighlow\static\" />
     <Folder Include="mtghighlow\static\css\" />
     <Folder Include="mtghighlow\static\img\" />
@@ -52,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="mtghighlow.pubxml.user" />
+    <Content Include="mtghighlow\db\cards.db" />
     <Content Include="web.config" />
     <None Include="web.debug.config" />
     <None Include="mtghighlow.pubxml" />
