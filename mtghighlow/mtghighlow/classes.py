@@ -94,8 +94,12 @@ class Card:
         self.cardset = cardset if cardset else ''
         self.cardname = cardname if cardname else ''
         self.realprice = realprice if realprice else -1.0
-        self.fakeprice = fakeprice if fakeprice else self.getfakeprice(1)
         self.image = image if image else getCardImageURL(cardname, cardset)
+
+        if fakeprice:
+            self.fakeprice = fakeprice
+        else:
+            self.getfakeprice(1)
 
     def getfakeprice(self, streak):
         multiplier = 1 + uniform((-0.985**streak), (0.985**streak))

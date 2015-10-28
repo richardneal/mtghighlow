@@ -20,14 +20,13 @@ def goldfishToDB(cardlist):
     c = conn.cursor()
     c.executescript('drop table if exists cardlist')
     c.executescript('''create table cardlist
-            (name text, setname text, price real)''')
+            (name text, setname text, price real, rarity text)''')
     for item in cardlist:
-        c.execute('insert into cardlist values (?,?,?)', item)
+        c.execute('insert into cardlist values (?,?,?,?)', item)
     conn.commit()
     for row in c.execute('SELECT * FROM cardlist'):
         print row
     conn.close()
-
 
 def query_db(query, args=(), one=False):
     cur = g.db.execute(query, args)
@@ -117,19 +116,37 @@ def getGoldfishTotalCards (paper):
         for set in sets:
             try:
                 info = []
-                setname = convertSetname(set.find('a', {"class" : "priceList-set-header-link"}, href=True)['href'][7:])
-                print setname
-                cards = [card.find(text=True).strip() for card in set.findAll('dt')]
-                prices = [card.find(text=True).strip().replace(',', '') for card in set.findAll("div", {"class" : "priceList-price-price-wrapper"})]
-                if (len(cards) == len(prices)):
-                    setarray = [setname]*len(cards)
-                    info = zip(cards, setarray, prices)
-                else:
-                    print "There was an error with the card list not matching length of prices"
+                rarities = []
+                cards = []
+                prices = []
 
-                a.extend(info)
+                setnamediv = set.find('a', {"class" : "priceList-set-header-link"}, href=True)
+                if setnamediv:
+                    setname = convertSetname(setnamediv['href'][7:])
+                else:
+                    continue
+                print setname
+
+                for card in set.findAll('dt'):
+                     cards.append(card.text.strip())
+                     try:
+                         rarities.append(card.parent.findPreviousSibling('h4').text)
+                     except Exception as e:
+                         print e
+                         rarities.append('')
+
+                for price in set.findAll("div", {"class" : "priceList-price-price-wrapper"}):
+                     prices.append(price.text.strip().replace(',', ''))
+
+                if (len(cards) == len(prices) == len(rarities)):
+                    setarray = [setname]*len(cards)
+                    info = zip(cards, setarray, prices, rarities)
+                    a.extend(info)
+                else:
+                    print "There was an error with the card list not matching length of prices. There were " + str(len(cards)) + " cards and " + str(len(prices)) + " prices and " + str(len(rarities)) + " rarities."
+            
             except Exception as e:
-                pass
+                print e
 
     goldfishToDB(a)
 
