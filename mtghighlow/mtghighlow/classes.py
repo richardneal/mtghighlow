@@ -15,7 +15,7 @@ class Streak:
             self.q = []
             for i in range(self.maxlength):
                 card = self.allcards.pop(0)
-                self.q.append(Card(cardname=card[0], cardset=card[1], realprice=card[2]))
+                self.q.append(Card(cardname=card[0], cardsetfull=card[1], cardset=card[2], realprice=card[3], rarity=card[4]))
 
     def new_card(self, choice = None):
         result = 0
@@ -82,7 +82,7 @@ class Streak:
             self.allcards.extend(getCardlistFromDB())
 
         bottom = self.allcards.pop(0)
-        bottomcard = Card(cardname=bottom[0], cardset=bottom[1], realprice=bottom[2])
+        bottomcard = Card(cardname=bottom[0], cardsetfull=bottom[1], cardset=bottom[2], realprice=bottom[3], rarity=bottom[4])
         self.q.append(bottomcard)
 
         self.q[0].getfakeprice(self.streak)
@@ -90,11 +90,13 @@ class Streak:
         return self.q[0], bottomcard, self.beststreak, result
 
 class Card:
-    def __init__(self, cardset = None, cardname = None, realprice = 0, fakeprice = 0, image = None):
+    def __init__(self, cardset = None, cardsetfull = None, cardname = None, realprice = 0, fakeprice = 0, image = None, rarity = None):
         self.cardset = cardset if cardset else ''
+        self.cardsetfull = cardsetfull if cardsetfull else ''
         self.cardname = cardname if cardname else ''
         self.realprice = realprice if realprice else -1.0
         self.image = image if image else getCardImageURL(cardname, cardset)
+        self.rarity = rarity if rarity else ''
 
         if fakeprice:
             self.fakeprice = fakeprice
@@ -116,11 +118,13 @@ class HighLowJsonEncoder(JSONEncoder):
             }
         elif isinstance(obj, Card):
             return {
-                'cardset': obj.cardset, 
+                'cardset': obj.cardset,
+                'cardsetfull': obj.cardsetfull, 
                 'cardname': obj.cardname,
                 'realprice': obj.realprice,
                 'fakeprice': obj.fakeprice,
                 'image': obj.image,
+                'rarity': obj.rarity,
             }
         return super(MyJSONEncoder, self).default(obj)
 

@@ -52,13 +52,13 @@ function CardStack() {
     this.init = function (cards) {
         this.updatevisuals(null, cards[0]);
         for (var i = 0; i < cards.length; i++) {
-            wrap.append("<div class='card'><img alt='" + cards[i].cardname + "' src='" + cards[i].image + "' /><span>" + cards[i].cardname + ", " + cards[i].cardset + "</span></div>");
+            wrap.append("<div class='card'><img alt='" + cards[i].cardname + "' src='" + cards[i].image + "' /><span>" + cards[i].cardname + ", " + cards[i].cardsetfull + "</span></div>");
         }
     }
 
     this.cycle = function (newcard, streak, currentcard, beststreak, correct) {
         this.updatevisuals(streak, currentcard, beststreak, correct);
-        wrap.append("<div class='card'><img alt='" + newcard.cardname + "' src='" + newcard.image + "' /><span><strong>" + newcard.cardname + ", " + newcard.cardset + "</strong></span></div>");
+        wrap.append("<div class='card'><img alt='" + newcard.cardname + "' src='" + newcard.image + "' /><span><strong>" + newcard.cardname + ", " + newcard.cardsetfull + "</strong></span></div>");
     }
 };
 
@@ -124,5 +124,8 @@ $(document).ready(function(){
 });
 
 function formatNumber(num) {
-    return num.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,')
+    if (num != null)
+        return num.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,')
+    else
+        return -1
 }
