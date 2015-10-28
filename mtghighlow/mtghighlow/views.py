@@ -1,39 +1,18 @@
 ﻿from flask import Flask, render_template, g, session, request, jsonify
-from flask.json import JSONEncoder
-from mtghighlow import app, classes
+from mtghighlow import app
+from mtghighlow.classes import Card, Streak, HighLowJsonEncoder, HighLowJsonDecoder
 
-class MyJSONEncoder(JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, classes.Streak):
-            return {
-                'allcards': obj.allcards, 
-                'streak': obj.streak,
-                'beststreak': obj.beststreak,
-                'queue': obj.q,
-            }
-        elif isinstance(obj, classes.Card):
-            return {
-                'cardset': obj.cardset, 
-                'cardname': obj.cardname,
-                'realprice': obj.realprice,
-                'fakeprice': obj.fakeprice,
-                'image': obj.image,
-            }
-        return super(MyJSONEncoder, self).default(obj)
-
-
-app.json_encoder = MyJSONEncoder
+app.json_encoder = HighLowJsonEncoder
+app.json_decoder = HighLowJsonDecoder
 
 @app.route('/', methods=['GET'])
 def index():
     if "streak" in session:
-        streak = classes.Streak(session["streak"])
+        streak = session["streak"]
     else:
-        streak = classes.Streak()
+        streak = Streak()
 
-    cardlist = []
-    for i in range(streak.maxlength):
-        cardlist.append(streak.new_card()[1])
+    cardlist = streak.q
     session["streak"] = streak
     return render_template('index.html', cards=cardlist, beststreak=streak.beststreak, streak=streak.streak)
 
@@ -45,7 +24,7 @@ def newcard():
         choice = request.args.get('choice')
     except:
         choice = "error"
-    streak = classes.Streak(session["streak"])
+    streak = session["streak"]
     currentcard, newcard, beststreak, correct = streak.new_card(choice)
     print 'Best Streak = ' + str(beststreak)
     session["streak"] = streak
