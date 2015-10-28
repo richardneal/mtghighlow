@@ -130,8 +130,8 @@ body {
 }
 
 .card {
-    max-height: 100%;
-    max-width: 90%;
+    height: 50vmax;
+    width: 35vmax;
     border-radius: 3%;
     overflow: hidden;
     box-shadow: 0 .1em .3em rgba(0, 0, 0, 0.2);
@@ -168,7 +168,7 @@ body {
 
     .card img {
         height: 100%;
-        max-width: 100%;
+        width: auto;
         background: black;
         vertical-align: top;
     }
@@ -177,7 +177,7 @@ body {
         position: absolute;
         bottom: 0;
         left: 0;
-        width: 100%;
+        width: 50vmax;
         height: 3vh;
         padding: 3%;
         font: 2vh "Open Sans";
