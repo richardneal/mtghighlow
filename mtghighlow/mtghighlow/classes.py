@@ -1,5 +1,5 @@
 ﻿from scraper import getCardImageURL, getCardlistFromDB
-import random
+from random import uniform
 
 class Streak:
     def __init__(self, serialized_dict=None):
@@ -12,6 +12,7 @@ class Streak:
             for elem in serialized_dict['queue']:
                 self.q.append(Card(elem["cardset"], elem["cardname"], elem["realprice"], elem["fakeprice"], elem["image"]))
                 if len(self.q) > self.maxlength:
+                    print "popping " + str(elem["cardname"])
                     self.q.pop(0)
         except Exception as e:
             print str(e)
@@ -115,6 +116,6 @@ class Card:
             self.image = getCardImageURL(cardname, cardset)
 
     def getfakeprice(self, streak):
-        multiplier = 1 + random.uniform((-0.985**streak), (0.985**streak))
-        fakepricefloat = float(self.realprice) * multiplier
+        multiplier = 1 + uniform((-0.985**streak), (0.985**streak))
+        self.fakeprice = float(self.realprice) * multiplier
 
