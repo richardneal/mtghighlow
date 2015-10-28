@@ -8,6 +8,7 @@ import logging
 from bs4 import BeautifulSoup
 import sqlite3
 import os
+import time
 
 def connect_db():
     dir = os.path.dirname(__file__)
@@ -15,18 +16,38 @@ def connect_db():
     filename = os.path.join(dir, 'db\cards.db')
     return sqlite3.connect(filename)
 
+def archive_db():
+    dir = os.path.dirname(__file__)
+    print str(dir)
+    filename = os.path.join(dir, 'db\cards.db')
+    if not os.path.isdir(dir+'\\db\\archive\\'):
+        os.makedirs(dir+'\\db\\archive\\')
+    if os.path.isfile(filename):
+        try:
+            newfilename = dir+'\\db\\archive\\cardsarchive'+time.strftime("%Y%m%d-%H%M%S")+'.db'
+            print newfilename
+            os.rename(filename, newfilename)
+        except Exception as e:
+            print e
+            return False
+    open(filename, 'a').close()
+    return True
+
 def goldfishToDB(cardlist):
-    conn = connect_db()
-    c = conn.cursor()
-    c.executescript('drop table if exists cardlist')
-    c.executescript('''create table cardlist
-            (name text, setname text, price real)''')
-    for item in cardlist:
-        c.execute('insert into cardlist values (?,?,?)', item)
-    conn.commit()
-    for row in c.execute('SELECT * FROM cardlist'):
-        print row
-    conn.close()
+    if archive_db():
+        conn = connect_db()
+        c = conn.cursor()
+        c.executescript('drop table if exists cardlist')
+        c.executescript('''create table cardlist
+                (name text, setname text, price real)''')
+        for item in cardlist:
+            c.execute('insert into cardlist values (?,?,?)', item)
+        conn.commit()
+        for row in c.execute('SELECT * FROM cardlist'):
+            print row
+        conn.close()
+    else:
+        print 'Could not refresh DB'
 
 
 def query_db(query, args=(), one=False):
