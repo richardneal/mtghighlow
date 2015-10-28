@@ -7,11 +7,7 @@ app.json_decoder = HighLowJsonDecoder
 
 @app.route('/', methods=['GET'])
 def index():
-    if "streak" in session:
-        streak = session["streak"]
-    else:
-        streak = Streak()
-
+    streak = session.get('streak', Streak())
     cardlist = streak.q
     session["streak"] = streak
     return render_template('index.html', cards=cardlist, beststreak=streak.beststreak, streak=streak.streak)
@@ -19,11 +15,7 @@ def index():
 @app.route('/newcard')
 def newcard():
     print request.args
-    #we didnt have a try here before, and i havent had any issues, but it feels like we need a try here...
-    try:
-        choice = request.args.get('choice')
-    except:
-        choice = "error"
+    choice = request.args.get('choice', 'error')
     streak = session["streak"]
     currentcard, newcard, beststreak, correct = streak.new_card(choice)
     print 'Best Streak = ' + str(beststreak)

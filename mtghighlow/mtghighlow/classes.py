@@ -5,21 +5,9 @@ from flask.json import JSONEncoder, JSONDecoder
 class Streak:
     def __init__(self, allcards = None, streak = None, beststreak = None, q = None):
         self.maxlength = 5
-
-        if allcards:
-            self.allcards = allcards
-        else:
-            self.allcards = getCardlistFromDB()
-
-        if streak:
-            self.streak = streak
-        else:
-            self.streak = 0
-
-        if beststreak:
-            self.beststreak = beststreak
-        else:
-            self.beststreak = 0
+        self.allcards = allcards if allcards else getCardlistFromDB()
+        self.streak = streak if streak else 0
+        self.beststreak = beststreak if beststreak else 0
 
         if q:
             self.q = q
@@ -103,29 +91,15 @@ class Streak:
 
 class Card:
     def __init__(self, cardset = None, cardname = None, realprice = 0, fakeprice = 0, image = None):
-        self.cardset = cardset
-        self.cardname = cardname
-
-        if realprice:
-            self.realprice = realprice
-        else:
-            self.realprice = -1.0
-
-        if fakeprice:
-            self.fakeprice = fakeprice
-        else:
-            self.getfakeprice(1)
-
-        if image:
-            self.image = image
-        else:
-            self.image = getCardImageURL(cardname, cardset)
+        self.cardset = cardset if cardset else ''
+        self.cardname = cardname if cardname else ''
+        self.realprice = realprice if realprice else -1.0
+        self.fakeprice = fakeprice if fakeprice else self.getfakeprice(1)
+        self.image = image if image else getCardImageURL(cardname, cardset)
 
     def getfakeprice(self, streak):
         multiplier = 1 + uniform((-0.985**streak), (0.985**streak))
         self.fakeprice = float(self.realprice) * multiplier
-
-
 
 class HighLowJsonEncoder(JSONEncoder):
     def default(self, obj):
