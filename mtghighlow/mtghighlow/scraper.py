@@ -39,9 +39,9 @@ def goldfishToDB(cardlist):
         c = conn.cursor()
         c.executescript('drop table if exists cardlist')
         c.executescript('''create table cardlist
-                (name text, setname text, price real)''')
+                (name text, fullsetname text, setname text, price real)''')
         for item in cardlist:
-            c.execute('insert into cardlist values (?,?,?)', item)
+            c.execute('insert into cardlist values (?,?,?,?)', item)
         conn.commit()
         for row in c.execute('SELECT * FROM cardlist'):
             print row
@@ -138,13 +138,15 @@ def getGoldfishTotalCards (paper):
         for set in sets:
             try:
                 info = []
-                setname = convertSetname(set.find('a', {"class" : "priceList-set-header-link"}, href=True)['href'][7:])
-                print setname
+                setname = convertSetname(set.find('a', {"class" : "priceList-set-header-link"}, href=True, text=True)['href'][7:])
+                fullsetname = set.find('a', {"class" : "priceList-set-header-link"}, href=True, text=True).contents[0]
+                print fullsetname + ', ' + setname
                 cards = [card.find(text=True).strip() for card in set.findAll('dt')]
                 prices = [card.find(text=True).strip().replace(',', '') for card in set.findAll("div", {"class" : "priceList-price-price-wrapper"})]
                 if (len(cards) == len(prices)):
                     setarray = [setname]*len(cards)
-                    info = zip(cards, setarray, prices)
+                    fullsetarray = [fullsetname]*len(cards)
+                    info = zip(cards, fullsetarray, setarray, prices)
                 else:
                     print "There was an error with the card list not matching length of prices"
 
