@@ -9,8 +9,8 @@ function CardStack() {
 
     this.updatevisuals = function (streak, currentcard, beststreak, result) {
         if (this.lastcard != null) {
-            $('#fakepriceold').html('$' + this.lastcard.fakeprice);
-            $('#realpriceold').html('$' + this.lastcard.realprice);
+            $('#fakepriceold').html('$' + formatNumber(this.lastcard.fakeprice));
+            $('#realpriceold').html('$' + formatNumber(this.lastcard.realprice));
             if ((this.lastcard.cardname).length > 17)
                 this.lastcard.cardname = (this.lastcard.cardname).substring(0, 17) + '...';
             $('#nameold').html(this.lastcard.cardname);
@@ -22,7 +22,7 @@ function CardStack() {
             $('#beststreak').html('TOP: ' + beststreak)
         }
         if (currentcard != null) {
-            $('#displayprice').html('$' + currentcard.fakeprice);
+            $('#displayprice').html('$' + formatNumber(currentcard.fakeprice));
             this.lastcard = currentcard;
         }
         if (result != null) {
@@ -122,3 +122,7 @@ function initcardstack(cards) {
 
 $(document).ready(function(){
 });
+
+function formatNumber(num) {
+    return num.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,')
+}
