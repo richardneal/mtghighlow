@@ -28,7 +28,6 @@ function CardStack() {
             this.lastcard = currentcard;
         }
         if (result != null) {
-            $('#correct').removeClass('title')
             if (result == 'correct') {
                 $('#correct').html('CORRECT');
                 $('#correct').removeClass('wrong').removeClass('lucky').addClass('correct')
@@ -54,13 +53,13 @@ function CardStack() {
     this.init = function (cards) {
         this.updatevisuals(null, cards[0]);
         for (var i = 0; i < cards.length; i++) {
-            wrap.append("<div class='slide'><img alt='" + cards[i].cardname + "' src='" + cards[i].image + "' /></div>");
+            wrap.append("<div class='magiccard'><img alt='" + cards[i].cardname + "' src='" + cards[i].image + "' /></div>");
         }
     }
 
     this.cycle = function (newcard, streak, currentcard, beststreak, correct) {
         this.updatevisuals(streak, currentcard, beststreak, correct);
-        wrap.append("<div class='slide'><img alt='" + newcard.cardname + "' src='" + newcard.image + "' /></div>");
+        wrap.append("<div class='magiccard'><img alt='" + newcard.cardname + "' src='" + newcard.image + "' /></div>");
     }
 };
 
@@ -82,7 +81,7 @@ var App = {
         var self = this;
         if(!this.blocked){
             this.blocked = true;
-            $('.card').eq(0).addClass(animate).one(animationEndEvent, function(){
+            $('.magiccard').eq(0).addClass(animate).one(animationEndEvent, function(){
                 $(this).remove();
                 $.getJSON($SCRIPT_ROOT + '/newcard', {
                     choice: self.choice,
