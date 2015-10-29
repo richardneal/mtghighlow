@@ -49,11 +49,27 @@
     <Folder Include="mtghighlow\static\css\" />
     <Folder Include="mtghighlow\static\img\" />
     <Folder Include="mtghighlow\static\js\" />
+    <Folder Include="mtghighlow\static\ratchet\" />
+    <Folder Include="mtghighlow\static\ratchet\css\" />
+    <Folder Include="mtghighlow\static\ratchet\fonts\" />
+    <Folder Include="mtghighlow\static\ratchet\js\" />
     <Folder Include="mtghighlow\templates\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="mtghighlow.pubxml.user" />
     <Content Include="mtghighlow\db\cards.db" />
+    <Content Include="mtghighlow\static\ratchet\css\ratchet-theme-android.css" />
+    <Content Include="mtghighlow\static\ratchet\css\ratchet-theme-android.min.css" />
+    <Content Include="mtghighlow\static\ratchet\css\ratchet-theme-ios.css" />
+    <Content Include="mtghighlow\static\ratchet\css\ratchet-theme-ios.min.css" />
+    <Content Include="mtghighlow\static\ratchet\css\ratchet.css" />
+    <Content Include="mtghighlow\static\ratchet\css\ratchet.min.css" />
+    <Content Include="mtghighlow\static\ratchet\fonts\ratchicons.eot" />
+    <Content Include="mtghighlow\static\ratchet\fonts\ratchicons.svg" />
+    <Content Include="mtghighlow\static\ratchet\fonts\ratchicons.ttf" />
+    <Content Include="mtghighlow\static\ratchet\fonts\ratchicons.woff" />
+    <Content Include="mtghighlow\static\ratchet\js\ratchet.js" />
+    <Content Include="mtghighlow\static\ratchet\js\ratchet.min.js" />
     <Content Include="web.config" />
     <None Include="web.debug.config" />
     <None Include="mtghighlow.pubxml" />
