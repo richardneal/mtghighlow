@@ -23,6 +23,8 @@ function CardStack() {
         }
         if (currentcard != null) {
             $('#displayprice').html('$' + currentcard.fakeprice);
+            $('#cardname').html(currentcard.cardname)
+            $('#setname').html(currentcard.setname)
             this.lastcard = currentcard;
         }
         if (result != null) {
@@ -52,13 +54,13 @@ function CardStack() {
     this.init = function (cards) {
         this.updatevisuals(null, cards[0]);
         for (var i = 0; i < cards.length; i++) {
-            wrap.append("<div class='card'><img alt='" + cards[i].cardname + "' src='" + cards[i].image + "' /><span>" + cards[i].cardname + ", " + cards[i].cardset + "</span></div>");
+            wrap.append("<div class='slide'><img alt='" + cards[i].cardname + "' src='" + cards[i].image + "' /></div>");
         }
     }
 
     this.cycle = function (newcard, streak, currentcard, beststreak, correct) {
         this.updatevisuals(streak, currentcard, beststreak, correct);
-        wrap.append("<div class='card'><img alt='" + newcard.cardname + "' src='" + newcard.image + "' /><span><strong>" + newcard.cardname + ", " + newcard.cardset + "</strong></span></div>");
+        wrap.append("<div class='slide'><img alt='" + newcard.cardname + "' src='" + newcard.image + "' /></div>");
     }
 };
 
