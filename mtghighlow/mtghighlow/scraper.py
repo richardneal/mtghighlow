@@ -8,6 +8,7 @@ import logging
 from bs4 import BeautifulSoup
 import sqlite3
 import os
+import time
 
 def connect_db():
     dir = os.path.dirname(__file__)
@@ -15,19 +16,38 @@ def connect_db():
     filename = os.path.join(dir, 'db\cards.db')
     return sqlite3.connect(filename)
 
-def goldfishToDB(cardlist):
-    conn = connect_db()
-    c = conn.cursor()
-    c.executescript('drop table if exists cardlist')
-    c.executescript('''create table cardlist
-            (name text, setname text, price real)''')
-    for item in cardlist:
-        c.execute('insert into cardlist values (?,?,?)', item)
-    conn.commit()
-    for row in c.execute('SELECT * FROM cardlist'):
-        print row
-    conn.close()
+def archive_db():
+    dir = os.path.dirname(__file__)
+    print str(dir)
+    filename = os.path.join(dir, 'db\cards.db')
+    if not os.path.isdir(dir+'\\db\\archive\\'):
+        os.makedirs(dir+'\\db\\archive\\')
+    if os.path.isfile(filename):
+        try:
+            newfilename = dir+'\\db\\archive\\cardsarchive'+time.strftime("%Y%m%d-%H%M%S")+'.db'
+            print newfilename
+            os.rename(filename, newfilename)
+        except Exception as e:
+            print e
+            return False
+    open(filename, 'a').close()
+    return True
 
+def goldfishToDB(cardlist):
+    if archive_db():
+        conn = connect_db()
+        c = conn.cursor()
+        c.executescript('drop table if exists cardlist')
+        c.executescript('''create table cardlist
+                (name text, fullsetname text, setname text, price real, rarity text)''')
+        for item in cardlist:
+                c.execute('insert into cardlist values (?,?,?,?,?)', item)
+        conn.commit()
+        for row in c.execute('SELECT * FROM cardlist'):
+            print row
+        conn.close()
+    else:
+        print 'Could not refresh DB'
 
 def query_db(query, args=(), one=False):
     cur = g.db.execute(query, args)
@@ -63,7 +83,7 @@ def getGoldfishFormatCards(format,paper):
 def getCardlistFromDB():
     conn = connect_db()
     c = conn.cursor()
-    cardlist = c.execute('select * from cardlist order by random() limit 100').fetchall()
+    cardlist = c.execute('select * from cardlist where rarity is not "Sealed Product" order by random() limit 100').fetchall()
     for card in cardlist:
         print card
     conn.close()
@@ -117,19 +137,39 @@ def getGoldfishTotalCards (paper):
         for set in sets:
             try:
                 info = []
-                setname = convertSetname(set.find('a', {"class" : "priceList-set-header-link"}, href=True)['href'][7:])
-                print setname
-                cards = [card.find(text=True).strip() for card in set.findAll('dt')]
-                prices = [card.find(text=True).strip().replace(',', '') for card in set.findAll("div", {"class" : "priceList-price-price-wrapper"})]
-                if (len(cards) == len(prices)):
-                    setarray = [setname]*len(cards)
-                    info = zip(cards, setarray, prices)
-                else:
-                    print "There was an error with the card list not matching length of prices"
+                rarities = []
+                cards = []
+                prices = []
 
-                a.extend(info)
+                setnamediv = set.find('a', {"class" : "priceList-set-header-link"}, href=True, text=True)
+                if setnamediv:
+                    setname = convertSetname(setnamediv['href'][7:])
+                    fullsetname = setnamediv.contents[0]
+                else:
+                    continue
+                print setname
+
+                for card in set.findAll('dt'):
+                     cards.append(card.text.strip())
+                     try:
+                         rarities.append(card.parent.findPreviousSibling('h4').text)
+                     except Exception as e:
+                         print e
+                         rarities.append('')
+
+                for price in set.findAll("div", {"class" : "priceList-price-price-wrapper"}):
+                     prices.append(price.text.strip().replace(',', ''))
+
+                if (len(cards) == len(prices) == len(rarities)):
+                    setarray = [setname]*len(cards)
+                    fullsetarray = [fullsetname]*len(cards)
+                    info = zip(cards, fullsetarray, setarray, prices, rarities)
+                    a.extend(info)
+                else:
+                    print "There was an error with the card list not matching length of prices. There were " + str(len(cards)) + " cards and " + str(len(prices)) + " prices and " + str(len(rarities)) + " rarities."
+
             except Exception as e:
-                pass
+                print e
 
     goldfishToDB(a)
 

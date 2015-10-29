@@ -9,8 +9,8 @@ function CardStack() {
 
     this.updatevisuals = function (streak, currentcard, beststreak, result) {
         if (this.lastcard != null) {
-            $('#fakepriceold').html('$' + this.lastcard.fakeprice);
-            $('#realpriceold').html('$' + this.lastcard.realprice);
+            $('#fakepriceold').html('$' + formatNumber(this.lastcard.fakeprice));
+            $('#realpriceold').html('$' + formatNumber(this.lastcard.realprice));
             if ((this.lastcard.cardname).length > 17)
                 this.lastcard.cardname = (this.lastcard.cardname).substring(0, 17) + '...';
             $('#nameold').html(this.lastcard.cardname);
@@ -22,9 +22,7 @@ function CardStack() {
             $('#beststreak').html('TOP: ' + beststreak)
         }
         if (currentcard != null) {
-            $('#displayprice').html('$' + currentcard.fakeprice);
-            $('#cardname').html(currentcard.cardname)
-            $('#setname').html(currentcard.setname)
+            $('#displayprice').html('$' + formatNumber(currentcard.fakeprice));
             this.lastcard = currentcard;
         }
         if (result != null) {
@@ -54,13 +52,13 @@ function CardStack() {
     this.init = function (cards) {
         this.updatevisuals(null, cards[0]);
         for (var i = 0; i < cards.length; i++) {
-            wrap.append("<div class='slide'><img alt='" + cards[i].cardname + "' src='" + cards[i].image + "' /></div>");
+            wrap.append("<div class='card'><img alt='" + cards[i].cardname + "' src='" + cards[i].image + "' /><span>" + cards[i].cardname + ", " + cards[i].cardsetfull + "</span></div>");
         }
     }
 
     this.cycle = function (newcard, streak, currentcard, beststreak, correct) {
         this.updatevisuals(streak, currentcard, beststreak, correct);
-        wrap.append("<div class='slide'><img alt='" + newcard.cardname + "' src='" + newcard.image + "' /></div>");
+        wrap.append("<div class='card'><img alt='" + newcard.cardname + "' src='" + newcard.image + "' /><span><strong>" + newcard.cardname + ", " + newcard.cardsetfull + "</strong></span></div>");
     }
 };
 
@@ -124,3 +122,10 @@ function initcardstack(cards) {
 
 $(document).ready(function(){
 });
+
+function formatNumber(num) {
+    if (num != null)
+        return num.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1,')
+    else
+        return -1
+}

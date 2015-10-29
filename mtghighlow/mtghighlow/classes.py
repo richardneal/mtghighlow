@@ -1,26 +1,21 @@
 ﻿from scraper import getCardImageURL, getCardlistFromDB
-import random
+from random import uniform
+from flask.json import JSONEncoder, JSONDecoder
 
 class Streak:
-    def __init__(self, serialized_dict=None):
+    def __init__(self, allcards = None, streak = None, beststreak = None, q = None):
         self.maxlength = 5
-        self.q = []
-        try:
-            self.allcards = serialized_dict['allcards']
-            self.streak = serialized_dict['streak']
-            self.beststreak = serialized_dict['beststreak']
-            for elem in serialized_dict['queue']:
-                self.q.append(Card(elem["cardset"], elem["cardname"], elem["realprice"], elem["fakeprice"], elem["image"]))
-                if len(self.q) > self.maxlength:
-                    self.q.pop(0)
-        except Exception as e:
-            print str(e)
-            self.allcards = getCardlistFromDB()
-            print "all cards type is:" + str(type(self.allcards))
-            self.streak = 0
-            self.beststreak = 0
+        self.allcards = allcards if allcards else getCardlistFromDB()
+        self.streak = streak if streak else 0
+        self.beststreak = beststreak if beststreak else 0
 
-            print "done"
+        if q:
+            self.q = q
+        else:
+            self.q = []
+            for i in range(self.maxlength):
+                card = self.allcards.pop(0)
+                self.q.append(Card(cardname=card[0], cardsetfull=card[1], cardset=card[2], realprice=card[3], rarity=card[4]))
 
     def new_card(self, choice = None):
         result = 0
@@ -87,7 +82,7 @@ class Streak:
             self.allcards.extend(getCardlistFromDB())
 
         bottom = self.allcards.pop(0)
-        bottomcard = Card(cardname=bottom[0], cardset=bottom[1], realprice=bottom[2])
+        bottomcard = Card(cardname=bottom[0], cardsetfull=bottom[1], cardset=bottom[2], realprice=bottom[3], rarity=bottom[4])
         self.q.append(bottomcard)
 
         self.q[0].getfakeprice(self.streak)
@@ -95,29 +90,53 @@ class Streak:
         return self.q[0], bottomcard, self.beststreak, result
 
 class Card:
-    def __init__(self, cardset, cardname, realprice=0, fakeprice=0, image=None):
-        self.cardset = cardset
-        self.cardname = cardname
-
-        if realprice:
-            self.realprice = realprice
-        else:
-            self.realprice = -1.0
+    def __init__(self, cardset = None, cardsetfull = None, cardname = None, realprice = 0, fakeprice = 0, image = None, rarity = None):
+        self.cardset = cardset if cardset else ''
+        self.cardsetfull = cardsetfull if cardsetfull else ''
+        self.cardname = cardname if cardname else ''
+        self.realprice = realprice if realprice else -1.0
+        self.image = image if image else getCardImageURL(cardname, cardset)
+        self.rarity = rarity if rarity else ''
 
         if fakeprice:
             self.fakeprice = fakeprice
         else:
             self.getfakeprice(1)
 
-        if image:
-            self.image = image
-        else:
-            self.image = getCardImageURL(cardname, cardset)
-
     def getfakeprice(self, streak):
-        multiplier = 1 + random.uniform((-0.985**streak), (0.985**streak))
-        #The multiplier below can be used to test tricked and lucky scenarios. lower will always be 'tricked' or 'correct', higher will always be 'tricked' or 'wrong' and middle will always be 'lucky' or 'not lucky'
-        #multiplier = 1 + random.uniform(0,.005)
-        fakepricefloat = float(self.realprice) * multiplier
-        self.fakeprice = '{:0,.2f}'.format(fakepricefloat)
+        multiplier = 1 + uniform((-0.985**streak), (0.985**streak))
+        self.fakeprice = float(self.realprice) * multiplier
 
+class HighLowJsonEncoder(JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, Streak):
+            return {
+                'allcards': obj.allcards, 
+                'streak': obj.streak,
+                'beststreak': obj.beststreak,
+                'q': obj.q,
+            }
+        elif isinstance(obj, Card):
+            return {
+                'cardset': obj.cardset,
+                'cardsetfull': obj.cardsetfull, 
+                'cardname': obj.cardname,
+                'realprice': obj.realprice,
+                'fakeprice': obj.fakeprice,
+                'image': obj.image,
+                'rarity': obj.rarity,
+            }
+        return super(MyJSONEncoder, self).default(obj)
+
+class HighLowJsonDecoder(JSONDecoder):
+    def __init__(self, *args, **kwargs):
+        kwargs['object_hook'] = self.deserialize
+        JSONDecoder.__init__(self,  *args, **kwargs)
+
+    def deserialize(self, d): 
+        if 'allcards' in d:
+            return Streak(**d)
+        elif 'cardname' in d:
+            return Card(**d)
+        else:
+            return d
