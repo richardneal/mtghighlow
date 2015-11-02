@@ -39,9 +39,9 @@ def goldfishToDB(cardlist):
         c = conn.cursor()
         c.executescript('drop table if exists cardlist')
         c.executescript('''create table cardlist
-                (name text, fullsetname text, setname text, price real, rarity text)''')
+                (name text, fullsetname text, setname text, price real, rarity text, format text)''')
         for item in cardlist:
-                c.execute('insert into cardlist values (?,?,?,?,?)', item)
+                c.execute('insert into cardlist values (?,?,?,?,?,?)', item)
         conn.commit()
         for row in c.execute('SELECT * FROM cardlist'):
             print row
@@ -163,7 +163,8 @@ def getGoldfishTotalCards (paper):
                 if (len(cards) == len(prices) == len(rarities)):
                     setarray = [setname]*len(cards)
                     fullsetarray = [fullsetname]*len(cards)
-                    info = zip(cards, fullsetarray, setarray, prices, rarities)
+                    formatarray = [format]*len(cards)
+                    info = zip(cards, fullsetarray, setarray, prices, rarities, formatarray)
                     a.extend(info)
                 else:
                     print "There was an error with the card list not matching length of prices. There were " + str(len(cards)) + " cards and " + str(len(prices)) + " prices and " + str(len(rarities)) + " rarities."
