@@ -9,13 +9,13 @@
 .lucky {
     color:#b3b;
 }
-
 .magiccard{
-    width:100%;
-    position: absolute;
+    width: 100%;
+    position:absolute;
+    padding-bottom:88px;
 }
 .magiccard img{
-    width:100%
+    width:100%;
 }
 
 .magiccard:nth-child(1) {
