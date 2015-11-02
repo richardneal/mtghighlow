@@ -25,6 +25,7 @@ function CardStack() {
             $('#displayprice').html('$' + formatNumber(currentcard.fakeprice));
             $('#cardname').html(currentcard.cardname)
             $('#setname').html(currentcard.cardsetfull)
+            $('#rarity').html(currentcard.rarity)
             this.lastcard = currentcard;
         }
         if (result != null) {

@@ -103,8 +103,13 @@ class Card:
         else:
             self.getfakeprice(1)
 
-    def getfakeprice(self, streak):
-        multiplier = 1 + uniform((-0.985**streak), (0.985**streak))
+    def getfakeprice(self, streak, difficulty = 'easy'):
+        if difficulty is 'easy':
+            multiplier = 1 + uniform((-0.985**streak), (0.985**streak))
+        elif difficulty is 'medium':
+            multiplier = 1 + uniform((-0.75**streak), (0.75**streak))
+        elif difficulty is 'hard':
+            multiplier = 1 + uniform((-0.5**streak), (0.5**streak))
         self.fakeprice = float(self.realprice) * multiplier
 
 class HighLowJsonEncoder(JSONEncoder):

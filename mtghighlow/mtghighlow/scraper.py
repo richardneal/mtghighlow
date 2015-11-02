@@ -80,10 +80,16 @@ def getGoldfishFormatCards(format,paper):
             break
     return a
 
-def getCardlistFromDB():
+def getCardlistFromDB(rarity=['Mythic','Rare','Uncommon','Common']):
     conn = connect_db()
     c = conn.cursor()
-    cardlist = c.execute('select * from cardlist where rarity is not "Sealed Product" order by random() limit 100').fetchall()
+    execute = 'select * from cardlist where ('
+    if rarity is not None:
+        execute += 'rarity is "' + rarity[0]
+    for rar in rarity[1:]:
+        execute += '" or rarity is "' + rar
+    execute += '") and rarity is not "Sealed Product" order by random() limit 100'
+    cardlist = c.execute(execute).fetchall()
     for card in cardlist:
         print card
     conn.close()
