@@ -80,7 +80,7 @@ def getGoldfishFormatCards(format,paper):
             break
     return a
 
-def getCardlistFromDB(rarity=['Mythic','Rare','Uncommon','Common']):
+def getCardlistFromDB(rarity=['Mythic','Rare','Uncommon','Common'], format=['standard','modern', 'legacy', 'special']):
     conn = connect_db()
     c = conn.cursor()
     execute = 'select * from cardlist where ('
@@ -88,7 +88,11 @@ def getCardlistFromDB(rarity=['Mythic','Rare','Uncommon','Common']):
         execute += 'rarity is "' + rarity[0]
     for rar in rarity[1:]:
         execute += '" or rarity is "' + rar
-    execute += '") and rarity is not "Sealed Product" order by random() limit 100'
+    if format is not None:
+        execute += '") and (format is "' + format[0]
+    for form in format[1:]:
+        execute += '" or format is "' + form
+    execute += '") order by random() limit 100'
     cardlist = c.execute(execute).fetchall()
     for card in cardlist:
         print card
@@ -140,6 +144,15 @@ def getGoldfishTotalCards (paper):
         soup = BeautifulSoup(rawHTML, "html.parser")
         sets = soup.findAll("div", {"class":"priceList-set"})
         print len(sets)
+        if format is 'standard':
+            formatstring = 'standard'
+        elif format is 'modern_one' or format is 'modern_two':
+            formatstring = 'modern'
+        elif format is 'legacy_one' or format is 'legacy_two':
+            formatstring = 'legacy'
+        elif format is 'special':
+            formatstring = 'special'
+
         for set in sets:
             try:
                 info = []
@@ -169,7 +182,7 @@ def getGoldfishTotalCards (paper):
                 if (len(cards) == len(prices) == len(rarities)):
                     setarray = [setname]*len(cards)
                     fullsetarray = [fullsetname]*len(cards)
-                    formatarray = [format]*len(cards)
+                    formatarray = [formatstring]*len(cards)
                     info = zip(cards, fullsetarray, setarray, prices, rarities, formatarray)
                     a.extend(info)
                 else:
