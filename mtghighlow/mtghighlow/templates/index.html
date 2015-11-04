@@ -27,8 +27,8 @@
 
     <!-- Make sure all your bars are the first things in your <body> -->
     <header class="bar bar-nav">
-        <a class="icon icon-gear pull-left" href="#settingsModal"></a>
-        <a class="icon icon-bars pull-right"></a>
+        <a class="icon icon-gear pull-left" href="/settings"></a>
+        <a class="icon icon-bars pull-right" href="/history"></a>
         <h1 class="title" id="correct">MTG High Low</h1>
     </header>
 
@@ -60,109 +60,6 @@
     <!-- Wrap all non-bar HTML in the .content div (this is actually what scrolls) -->
     <div class="content">
         <div id="cards">
-        </div>
-    </div>
-
-    <!-- Settings Modal -->
-    <div id="settingsModal" class="modal">
-        <header class="bar bar-nav">
-            <a class="icon icon-close pull-right" href="#settingsModal"></a>
-            <h1 class="title">Settings</h1>
-        </header>
-        <div class="content">
-            <h5 class="content-padded">Difficulty</h5>
-            <div class="segmented-control">
-                <a class="control-item active" href="#item1mobile">
-                    Easy
-                </a>
-                <a class="control-item" href="#item2mobile">
-                    Medium
-                </a>
-                <a class="control-item" href="#item3mobile">
-                    Hard
-                </a>
-            </div>
-            <h5 class="content-padded">Card Pool</h5>
-            <ul class="table-view">
-                <li class="table-view-cell media">
-                    <span class="media-object pull-left icon icon-star"></span>
-                    <div class="media-body">
-                        Standard
-                    </div>
-                    <div class="toggle active">
-                        <div class="toggle-handle"></div>
-                    </div>
-                </li>
-                <li class="table-view-cell media">
-                    <span class="media-object pull-left icon icon-star"></span>
-                    <div class="media-body">
-                        Modern
-                    </div>
-                    <div class="toggle">
-                        <div class="toggle-handle"></div>
-                    </div>
-                </li>
-                <li class="table-view-cell media">
-                    <span class="media-object pull-left icon icon-star"></span>
-                    <div class="media-body">
-                        Legacy
-                    </div>
-                    <div class="toggle">
-                        <div class="toggle-handle"></div>
-                    </div>
-                </li>
-                <li class="table-view-cell media">
-                    <span class="media-object pull-left icon icon-star"></span>
-                    <div class="media-body">
-                        Special Sets
-                    </div>
-                    <div class="toggle">
-                        <div class="toggle-handle"></div>
-                    </div>
-                </li>
-            </ul>
-            <h5 class="content-padded">Rarity</h5>
-            <ul class="table-view">
-                <li class="table-view-cell media">
-                    <span class="media-object pull-left icon icon-star-fill"></span>
-                    <div class="media-body">
-                        Mythic Rare
-                    </div>
-                    <div class="toggle active">
-                        <div class="toggle-handle"></div>
-                    </div>
-                </li>
-                <li class="table-view-cell media">
-                    <span class="media-object pull-left icon icon-star-fill"></span>
-                    <div class="media-body">
-                        Rare
-                    </div>
-                    <div class="toggle active">
-                        <div class="toggle-handle"></div>
-                    </div>
-                </li>
-                <li class="table-view-cell media">
-                    <span class="media-object pull-left icon icon-star-fill"></span>
-                    <div class="media-body">
-                        Uncommon
-                    </div>
-                    <div class="toggle active">
-                        <div class="toggle-handle"></div>
-                    </div>
-                </li>
-                <li class="table-view-cell media">
-                    <span class="media-object pull-left icon icon-star-fill"></span>
-                    <div class="media-body">
-                        Common
-                    </div>
-                    <div class="toggle active">
-                        <div class="toggle-handle"></div>
-                    </div>
-                </li>
-            </ul>
-            <div class="content-padded">
-                <button class="btn btn-positive btn-block">Save settings</button>
-            </div>
         </div>
     </div>
 

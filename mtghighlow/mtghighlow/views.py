@@ -21,3 +21,11 @@ def newcard():
     print 'Best Streak = ' + str(beststreak)
     session["streak"] = streak
     return jsonify({"newcard":newcard, "streak":streak.streak, "currentcard":currentcard, "beststreak":beststreak, "correct":correct})
+
+@app.route('/settings')
+def settings():
+    return render_template('settings.html')
+
+@app.route('/history')
+def history():
+    return render_template('history.html')

@@ -3,11 +3,14 @@ from random import uniform
 from flask.json import JSONEncoder, JSONDecoder
 
 class Streak:
-    def __init__(self, allcards = None, streak = None, beststreak = None, q = None):
+    def __init__(self, allcards = None, streak = None, beststreak = None, q = None, rarity=None, format=None, difficulty=None):
         self.maxlength = 5
-        self.allcards = allcards if allcards else getCardlistFromDB()
         self.streak = streak if streak else 0
         self.beststreak = beststreak if beststreak else 0
+        self.rarity = rarity if rarity else ['Mythic','Rare','Uncommon','Common']
+        self.format = format if format else ['standard','modern','legacy','special']
+        self.difficulty = difficulty if difficulty else ['easy']
+        self.allcards = allcards if allcards else getCardlistFromDB(self.rarity,self.format)
 
         if q:
             self.q = q
@@ -79,7 +82,7 @@ class Streak:
         print self.beststreak
 
         if len(self.allcards) < 10:
-            self.allcards.extend(getCardlistFromDB())
+            self.allcards.extend(getCardlistFromDB(self.rarity,self.format))
 
         bottom = self.allcards.pop(0)
         bottomcard = Card(cardname=bottom[0], cardsetfull=bottom[1], cardset=bottom[2], realprice=bottom[3], rarity=bottom[4])
@@ -119,6 +122,9 @@ class HighLowJsonEncoder(JSONEncoder):
                 'allcards': obj.allcards, 
                 'streak': obj.streak,
                 'beststreak': obj.beststreak,
+                'rarity':obj.rarity,
+                'difficulty':obj.difficulty,
+                'format':obj.format,
                 'q': obj.q,
             }
         elif isinstance(obj, Card):
