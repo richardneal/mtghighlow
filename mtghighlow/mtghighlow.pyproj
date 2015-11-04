@@ -70,6 +70,8 @@
     <Content Include="mtghighlow\static\ratchet\fonts\ratchicons.woff" />
     <Content Include="mtghighlow\static\ratchet\js\ratchet.js" />
     <Content Include="mtghighlow\static\ratchet\js\ratchet.min.js" />
+    <Content Include="mtghighlow\templates\history.html" />
+    <Content Include="mtghighlow\templates\settings.html" />
     <Content Include="web.config" />
     <None Include="web.debug.config" />
     <None Include="mtghighlow.pubxml" />
