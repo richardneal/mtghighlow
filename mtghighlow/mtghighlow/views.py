@@ -14,11 +14,11 @@ def index():
 
 @app.route('/newcard')
 def newcard():
-    print request.args
+    print(request.args)
     choice = request.args.get('choice', 'error')
     streak = session["streak"]
     currentcard, newcard, beststreak, correct = streak.new_card(choice)
-    print 'Best Streak = ' + str(beststreak)
+    print('Best Streak = ' + str(beststreak))
     session["streak"] = streak
     return jsonify({"newcard":newcard, "streak":streak.streak, "currentcard":currentcard, "beststreak":beststreak, "correct":correct})
 

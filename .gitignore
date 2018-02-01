@@ -216,3 +216,5 @@ bin/
 env/
 obj/
 *.pyc
+
+.idea/

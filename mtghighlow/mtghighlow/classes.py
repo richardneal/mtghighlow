@@ -1,4 +1,4 @@
-﻿from scraper import getCardImageURL, getCardlistFromDB
+﻿from mtghighlow.scraper import getCardImageURL, getCardlistFromDB
 from random import uniform
 from flask.json import JSONEncoder, JSONDecoder
 
@@ -24,7 +24,7 @@ class Streak:
         result = 0
         currentcard = None
         if choice:
-            print "choice: " + choice
+            print("choice: " + choice)
             currentcard = self.q.pop(0)
             try:
                 currentcard.fakeprice = float(currentcard.fakeprice)
@@ -33,53 +33,53 @@ class Streak:
                 currentcard.realprice = -1.0
                 currentcard.fakeprice = -1.0
             if choice == "error":
-                print "Error in choice! Real Price: "+ str(currentcard.realprice) + " Fake Price: " + str(currentcard.fakeprice)
+                print("Error in choice! Real Price: "+ str(currentcard.realprice) + " Fake Price: " + str(currentcard.fakeprice))
             elif abs(currentcard.fakeprice - currentcard.realprice) < .1 and choice == 'lucky':
                 result = 'lucky'
-                print "LUCKY!: You Selected Lucky, and Real Price: " + str(currentcard.realprice) + " was within .10 of Fake Price: " + str(currentcard.fakeprice) + ". +10 Points!"
+                print("LUCKY!: You Selected Lucky, and Real Price: " + str(currentcard.realprice) + " was within .10 of Fake Price: " + str(currentcard.fakeprice) + ". +10 Points!")
                 self.streak += 10
             elif currentcard.fakeprice > currentcard.realprice:
                 if choice == "lower":
                     result = 'correct'
-                    print "CORRECT: You Selected Lower, and Real Price: " + str(currentcard.realprice) + " was Lower than Fake Price: " + str(currentcard.fakeprice)
+                    print("CORRECT: You Selected Lower, and Real Price: " + str(currentcard.realprice) + " was Lower than Fake Price: " + str(currentcard.fakeprice))
                     self.streak += 1
                 elif choice == "higher":
                     result = 'wrong'
-                    print "WRONG: You Selected Higher, and Real Price: " + str(currentcard.realprice) + " was Lower than Fake Price: " + str(currentcard.fakeprice)
+                    print("WRONG: You Selected Higher, and Real Price: " + str(currentcard.realprice) + " was Lower than Fake Price: " + str(currentcard.fakeprice))
                     self.streak = 0
                 elif choice == "lucky":
                     result = 'notlucky'
-                    print "NOT SO LUCKY: You Selected Lucky, and Real Price: " + str(currentcard.realprice) + " was Lower than Fake Price: " + str(currentcard.fakeprice)
+                    print("NOT SO LUCKY: You Selected Lucky, and Real Price: " + str(currentcard.realprice) + " was Lower than Fake Price: " + str(currentcard.fakeprice))
                     self.streak = 0
             elif currentcard.fakeprice < currentcard.realprice:
                 if choice == "higher":
                     result = 'correct'
-                    print "CORRECT: You Selected Higher, and Real Price: " + str(currentcard.realprice) + " was Greater than Fake Price: " + str(currentcard.fakeprice)
+                    print("CORRECT: You Selected Higher, and Real Price: " + str(currentcard.realprice) + " was Greater than Fake Price: " + str(currentcard.fakeprice))
                     self.streak += 1
                 elif choice == "lower":
                     result = 'wrong'
-                    print "WRONG: You Selected Lower, and Real Price: " + str(currentcard.realprice) + " was Greater than Fake Price: " + str(currentcard.fakeprice)
+                    print("WRONG: You Selected Lower, and Real Price: " + str(currentcard.realprice) + " was Greater than Fake Price: " + str(currentcard.fakeprice))
                     self.streak = 0
                 elif choice == "lucky":
                     result = 'notlucky'
-                    print "NOT SO LUCKY: You Selected Lucky, and Real Price: " + str(currentcard.realprice) + " was Greater than Fake Price: " + str(currentcard.fakeprice)
+                    print("NOT SO LUCKY: You Selected Lucky, and Real Price: " + str(currentcard.realprice) + " was Greater than Fake Price: " + str(currentcard.fakeprice))
                     self.streak = 0
             elif currentcard.fakeprice == currentcard.realprice:
                 if currentcard.fakeprice == -1.0:
                     result = 'error'
-                    print "There was an error in converting your Real or Fake price, your streak should be unaffected."
+                    print("There was an error in converting your Real or Fake price, your streak should be unaffected.")
                 elif choice == "higher":
                     result = 'tricked'
-                    print "TRICKED: You Selected Higher, and Real Price: " + str(currentcard.realprice) + " was exactly Fake Price: " + str(currentcard.fakeprice) + ". Streak Unaffected"
+                    print("TRICKED: You Selected Higher, and Real Price: " + str(currentcard.realprice) + " was exactly Fake Price: " + str(currentcard.fakeprice) + ". Streak Unaffected")
                     self.streak += 0
                 elif choice == "lower":
                     result = 'tricked'
-                    print "TRICKED: You Selected Lower, and Real Price: " + str(currentcard.realprice) + " was excatly Fake Price: " + str(currentcard.fakeprice) + ". Streak Unaffected"
+                    print("TRICKED: You Selected Lower, and Real Price: " + str(currentcard.realprice) + " was excatly Fake Price: " + str(currentcard.fakeprice) + ". Streak Unaffected")
                     self.streak += 0
-        print self.streak
+        print(self.streak)
         if self.beststreak < self.streak:
             self.beststreak = self.streak
-        print self.beststreak
+        print(self.beststreak)
 
         if len(self.allcards) < 10:
             self.allcards.extend(getCardlistFromDB(self.rarity,self.format))
@@ -137,7 +137,10 @@ class HighLowJsonEncoder(JSONEncoder):
                 'image': obj.image,
                 'rarity': obj.rarity,
             }
-        return super(MyJSONEncoder, self).default(obj)
+        try:
+            return super().default(obj.decode())
+        except AttributeError:
+            return super().default(obj)
 
 class HighLowJsonDecoder(JSONDecoder):
     def __init__(self, *args, **kwargs):
