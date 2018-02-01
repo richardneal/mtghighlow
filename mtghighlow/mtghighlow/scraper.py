@@ -3,7 +3,9 @@ from bs4 import BeautifulSoup
 import sqlite3
 import os
 import time
+import ssl
 
+base_url = "http://www.mtggoldfish.com/"
 
 def connect_db():
     dir = os.path.dirname(__file__)
@@ -31,7 +33,7 @@ def archive_db():
     return True
 
 
-def goldfishToDB(cardlist):
+def site_to_db(cardlist):
     if archive_db():
         conn = connect_db()
         c = conn.cursor()
@@ -55,9 +57,9 @@ def query_db(query, args=(), one=False):
     return (rv[0] if rv else None) if one else rv
 
 
-def getGoldfishFormatCards(format, paper):
+def get_format_cards(format, paper):
     a = []
-    goldfishURL = "http://www.mtggoldfish.com/index/" + format
+    goldfishURL = base_url + "index/" + format
     htmlFile = urllib.urlopen(goldfishURL)
     rawHTML = htmlFile.read()
     soup = BeautifulSoup(rawHTML, "lxml")
@@ -81,7 +83,7 @@ def getGoldfishFormatCards(format, paper):
     return a
 
 
-def getCardlistFromDB(rarity=['Mythic', 'Rare', 'Uncommon', 'Common'],
+def get_cardlist_from_db(rarity=['Mythic', 'Rare', 'Uncommon', 'Common'],
                       format=['standard', 'modern', 'legacy', 'special']):
     conn = connect_db()
     c = conn.cursor()
@@ -99,63 +101,38 @@ def getCardlistFromDB(rarity=['Mythic', 'Rare', 'Uncommon', 'Common'],
     for card in cardlist:
         print(card)
     conn.close()
-    return cardlist;
+    return cardlist
 
 
-def convertSetname(name):
-    if name == u'PRM-CHP':
-        return 'CP'
-    elif name == 'PRM-FNM':
-        return 'FNMP'
-    elif name == 'PRM-GDP' or name == 'PRM-MSC':
-        return 'MGDC'
-    elif name == 'PRM-GWP' or name == 'PRM-WPN':
-        return 'GRC'
-    elif name == 'PRM-GPP':
-        return 'GPX'
-    elif name == 'PRM-JSS':
-        return 'SUS'
-    elif name == 'PRM-JUD':
-        return 'JR'
-    elif name == 'PRM-LPC':
-        return 'MLP'
-    elif name == 'PRM-MPR':
-        return 'MPRP'
-    elif name == 'PRM-MED':
-        return 'MBP'
-    elif name == 'PRM-PRE':
-        return 'PTC'
-    elif name == 'PRM-PTP':
-        return 'PRO'
-    elif name == 'PRM-REL':
-        return 'REP'
-    elif name == 'PRM-SPO':
-        return 'UQC'
-    else:
-        return name
+def convert_set_name(name):
+    set_conversions = {u'PRM-CHP': 'CP', 'PRM-FNM': 'FNMP', 'PRM-GDP': 'MGDC', 'PRM-MSC': 'MGDC', 
+                       'PRM-GWP': 'GRC', 'PRM-WPN': 'GRC', 'PRM-GPP': 'GPX', 'PRM-JSS': 'SUS', 
+                       'PRM-JUD': 'JR', 'PRM-LPC': 'MLP', 'PRM-MPR': 'MPRP', 'PRM-MED': 'MBP', 
+                       'PRM-PRE': 'PTC', 'PRM-PTP': 'PRO', 'PRM-REL': 'REP', 'PRM-SPO': 'UQC'}
+    return set_conversions.get(name, name)
 
 
-def getGoldfishTotalCards(paper):
-    a = []
+def get_total_cards(paper):
+    all_info = []
     if paper:
-        goldfishURL = "http://www.mtggoldfish.com/prices/paper/"
+        url = base_url + "prices/paper/"
     else:
-        goldfishURL = "http://www.mtggoldfish.com/prices/online/"
+        url = base_url + "prices/online/"
 
-    for format in ['standard', 'modern_two', 'modern_one', 'legacy_two', 'legacy_one', 'special']:
-        htmlFile = urllib.request.urlopen(goldfishURL + format)
-        rawHTML = htmlFile.read()
-        soup = BeautifulSoup(rawHTML, "html.parser")
+    for format in ('standard', 'modern_two', 'modern_one', 'legacy_two', 'legacy_one', 'special'):
+        with urllib.request.urlopen(url + format) as html_file:
+            raw_html = html_file.read()
+        soup = BeautifulSoup(raw_html, "html.parser")
         sets = soup.findAll("div", {"class": "priceList-set"})
         print(len(sets))
         if format is 'standard':
-            formatstring = 'standard'
+            format_string = 'standard'
         elif format is 'modern_one' or format is 'modern_two':
-            formatstring = 'modern'
+            format_string = 'modern'
         elif format is 'legacy_one' or format is 'legacy_two':
-            formatstring = 'legacy'
+            format_string = 'legacy'
         elif format is 'special':
-            formatstring = 'special'
+            format_string = 'special'
 
         for set in sets:
             try:
@@ -164,13 +141,13 @@ def getGoldfishTotalCards(paper):
                 cards = []
                 prices = []
 
-                setnamediv = set.find('a', {"class": "priceList-set-header-link"}, href=True, text=True)
-                if setnamediv:
-                    setname = convertSetname(setnamediv['href'][7:])
-                    fullsetname = setnamediv.contents[0]
+                set_name_div = set.find('a', {"class": "priceList-set-header-link"}, href=True, text=True)
+                if set_name_div:
+                    set_name = convert_set_name(set_name_div['href'][7:])
+                    full_set_name = set_name_div.contents[0]
                 else:
                     continue
-                print(setname)
+                print(set_name)
 
                 for card in set.findAll('dt'):
                     cards.append(card.text.strip())
@@ -184,43 +161,42 @@ def getGoldfishTotalCards(paper):
                     prices.append(price.text.strip().replace(',', ''))
 
                 if (len(cards) == len(prices) == len(rarities)):
-                    setarray = [setname] * len(cards)
-                    fullsetarray = [fullsetname] * len(cards)
-                    formatarray = [formatstring] * len(cards)
-                    info = zip(cards, fullsetarray, setarray, prices, rarities, formatarray)
-                    a.extend(info)
+                    set_list = [set_name] * len(cards)
+                    full_set_list = [full_set_name] * len(cards)
+                    format_list = [format_string] * len(cards)
+                    info = zip(cards, full_set_list, set_list, prices, rarities, format_list)
+                    all_info.extend(info)
                 else:
-                    print("There was an error with the card list not matching length of prices. There were " + str(
-                        len(cards)) + " cards and " + str(len(prices)) + " prices and " + str(
-                        len(rarities)) + " rarities.")
+                    print("There was an error with the card list not matching length of prices. There were " + str(len(cards)) + " cards and " + str(len(prices)) + " prices and " + str(len(rarities)) + " rarities.")
 
             except Exception as e:
                 print(e)
 
-    goldfishToDB(a)
+    site_to_db(all_info)
 
 
-def getGoldfishTopCards():
-    goldfishURL = "http://www.mtggoldfish.com/format-staples/standard/full/all"
-    htmlFile = urllib.urlopen(goldfishURL)
-    rawHTML = htmlFile.read()
-    endIndex = 1
+def get_top_cards():
+    url = "http://www.mtggoldfish.com/format-staples/standard/full/all"
+    with urllib.request.urlopen(url) as html_file:
+        raw_html = html_file.read()
+    end_index = 1
     cards = []
     for i in range(50):
-        firstIndex = rawHTML.find('href="/price/', endIndex)
-        secondIndex = rawHTML.find('/', firstIndex + 12)
-        thirdIndex = rawHTML.find('/', secondIndex + 1)
-        endIndex = rawHTML.find('"', thirdIndex + 1)
-        cards.append([rawHTML[secondIndex + 1:thirdIndex].replace('+', ' ')])
-        cards[-1].append(rawHTML[thirdIndex + 1:endIndex].replace('+', ' '))
+        first_index = raw_html.find('href="/price/', end_index)
+        second_index = raw_html.find('/', first_index + 12)
+        third_index = raw_html.find('/', second_index + 1)
+        end_index = raw_html.find('"', third_index + 1)
+        cards.append([raw_html[second_index + 1:third_index].replace('+', ' ')])
+        cards[-1].append(raw_html[third_index + 1:end_index].replace('+', ' '))
     return cards
 
 
-def getCardImageURL(cardName, cardSet):
-    magicInfoURL = "http://magiccards.info/query?q=" + urllib.parse.quote(cardName)
-    if cardSet:
-        magicInfoURL += urllib.parse.quote(" e:" + cardSet + "/en")
-    with urllib.request.urlopen(magicInfoURL) as htmlFile:
+def get_image_url(card_name, card_set):
+    context = ssl._create_unverified_context()
+    magicInfoURL = "http://magiccards.info/query?q=" + urllib.parse.quote(card_name)
+    if card_set:
+        magicInfoURL += urllib.parse.quote(" e:" + card_set + "/en")
+    with urllib.request.urlopen(magicInfoURL, context=context) as htmlFile:
         rawHTML = htmlFile.read()  # add error handling
         startURLIndex = rawHTML.find(b"/scans/")
         endURLIndex = rawHTML.find(b".jpg", startURLIndex)

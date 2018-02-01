@@ -1,142 +1,145 @@
-﻿from mtghighlow.scraper import getCardImageURL, getCardlistFromDB
+﻿from mtghighlow.scraper import get_image_url, get_cardlist_from_db
 from random import uniform
 from flask.json import JSONEncoder, JSONDecoder
+from enum import Enum
 
 class Streak:
-    def __init__(self, allcards = None, streak = None, beststreak = None, q = None, rarity=None, format=None, difficulty=None):
-        self.maxlength = 5
-        self.streak = streak if streak else 0
-        self.beststreak = beststreak if beststreak else 0
-        self.rarity = rarity if rarity else ['Mythic','Rare','Uncommon','Common']
+    def __init__(self, all_cards=None, current_streak_length=None, best_streak_length=None, queue=None, rarity=None, format=None, difficulty=None):
+        self.max_queue_length = 5
+        self.current_streak_length = current_streak_length if current_streak_length else 0
+        self.best_streak_length = best_streak_length if best_streak_length else 0
+        self.rarity = rarity if rarity else [rarity for rarity in Rarities.__members__.keys()]
         self.format = format if format else ['standard','modern','legacy','special']
-        self.difficulty = difficulty if difficulty else ['easy']
-        self.allcards = allcards if allcards else getCardlistFromDB(self.rarity,self.format)
+        self.difficulty = difficulty if difficulty else Difficulties.Easy
+        self.all_cards = all_cards if all_cards else get_cardlist_from_db(self.rarity, self.format)
 
-        if q:
-            self.q = q
+        if queue:
+            self.queue = queue
         else:
-            self.q = []
-            for i in range(self.maxlength):
-                card = self.allcards.pop(0)
-                self.q.append(Card(cardname=card[0], cardsetfull=card[1], cardset=card[2], realprice=card[3], rarity=card[4]))
+            self.queue = []
+            for i in range(self.max_queue_length):
+                card = self.all_cards.pop(0)
+                self.queue.append(Card(name=card[0], set_full=card[1], set=card[2], real_price=card[3], rarity=card[4]))
 
-    def new_card(self, choice = None):
-        result = 0
-        currentcard = None
+    def new_card(self, choice=None):
+        result = Results.Error
+        current_card = None
         if choice:
             print("choice: " + choice)
-            currentcard = self.q.pop(0)
+            current_card = self.queue.pop(0)
             try:
-                currentcard.fakeprice = float(currentcard.fakeprice)
-                currentcard.realprice = float(currentcard.realprice)
+                current_card.fake_price = float(current_card.fake_price)
+                current_card.real_price = float(current_card.real_price)
             except:
-                currentcard.realprice = -1.0
-                currentcard.fakeprice = -1.0
+                current_card.real_price = -1.0
+                current_card.fake_price = -1.0
             if choice == "error":
-                print("Error in choice! Real Price: "+ str(currentcard.realprice) + " Fake Price: " + str(currentcard.fakeprice))
-            elif abs(currentcard.fakeprice - currentcard.realprice) < .1 and choice == 'lucky':
-                result = 'lucky'
-                print("LUCKY!: You Selected Lucky, and Real Price: " + str(currentcard.realprice) + " was within .10 of Fake Price: " + str(currentcard.fakeprice) + ". +10 Points!")
-                self.streak += 10
-            elif currentcard.fakeprice > currentcard.realprice:
+                print("Error in choice! Real Price: " + str(current_card.real_price) + " Fake Price: " + str(current_card.fake_price))
+            elif abs(current_card.fake_price - current_card.real_price) < .1 and choice == 'lucky':
+                result = Results.Lucky
+                print("LUCKY!: You Selected Lucky, and Real Price: " + str(current_card.real_price) + " was within .10 of Fake Price: " + str(current_card.fake_price) + ". +10 Points!")
+                self.current_streak_length += 10
+            elif current_card.fake_price > current_card.real_price:
                 if choice == "lower":
-                    result = 'correct'
-                    print("CORRECT: You Selected Lower, and Real Price: " + str(currentcard.realprice) + " was Lower than Fake Price: " + str(currentcard.fakeprice))
-                    self.streak += 1
+                    result = Results.Correct
+                    print("CORRECT: You Selected Lower, and Real Price: " + str(current_card.real_price) + " was Lower than Fake Price: " + str(current_card.fake_price))
+                    self.current_streak_length += 1
                 elif choice == "higher":
-                    result = 'wrong'
-                    print("WRONG: You Selected Higher, and Real Price: " + str(currentcard.realprice) + " was Lower than Fake Price: " + str(currentcard.fakeprice))
-                    self.streak = 0
+                    result = Results.Incorrect
+                    print("WRONG: You Selected Higher, and Real Price: " + str(current_card.real_price) + " was Lower than Fake Price: " + str(current_card.fake_price))
+                    self.current_streak_length = 0
                 elif choice == "lucky":
-                    result = 'notlucky'
-                    print("NOT SO LUCKY: You Selected Lucky, and Real Price: " + str(currentcard.realprice) + " was Lower than Fake Price: " + str(currentcard.fakeprice))
-                    self.streak = 0
-            elif currentcard.fakeprice < currentcard.realprice:
+                    result = Results.Unlucky
+                    print("NOT SO LUCKY: You Selected Lucky, and Real Price: " + str(current_card.real_price) + " was Lower than Fake Price: " + str(current_card.fake_price))
+                    self.current_streak_length = 0
+            elif current_card.fake_price < current_card.real_price:
                 if choice == "higher":
-                    result = 'correct'
-                    print("CORRECT: You Selected Higher, and Real Price: " + str(currentcard.realprice) + " was Greater than Fake Price: " + str(currentcard.fakeprice))
-                    self.streak += 1
+                    result = Results.Correct
+                    print("CORRECT: You Selected Higher, and Real Price: " + str(current_card.real_price) + " was Greater than Fake Price: " + str(current_card.fake_price))
+                    self.current_streak_length += 1
                 elif choice == "lower":
-                    result = 'wrong'
-                    print("WRONG: You Selected Lower, and Real Price: " + str(currentcard.realprice) + " was Greater than Fake Price: " + str(currentcard.fakeprice))
-                    self.streak = 0
+                    result = Results.Incorrect
+                    print("WRONG: You Selected Lower, and Real Price: " + str(current_card.real_price) + " was Greater than Fake Price: " + str(current_card.fake_price))
+                    self.current_streak_length = 0
                 elif choice == "lucky":
-                    result = 'notlucky'
-                    print("NOT SO LUCKY: You Selected Lucky, and Real Price: " + str(currentcard.realprice) + " was Greater than Fake Price: " + str(currentcard.fakeprice))
-                    self.streak = 0
-            elif currentcard.fakeprice == currentcard.realprice:
-                if currentcard.fakeprice == -1.0:
-                    result = 'error'
+                    result = Results.Unlucky
+                    print("NOT SO LUCKY: You Selected Lucky, and Real Price: " + str(current_card.real_price) + " was Greater than Fake Price: " + str(current_card.fake_price))
+                    self.current_streak_length = 0
+            elif current_card.fake_price == current_card.real_price:
+                if current_card.fake_price == -1.0:
+                    result = Results.Error
                     print("There was an error in converting your Real or Fake price, your streak should be unaffected.")
                 elif choice == "higher":
-                    result = 'tricked'
-                    print("TRICKED: You Selected Higher, and Real Price: " + str(currentcard.realprice) + " was exactly Fake Price: " + str(currentcard.fakeprice) + ". Streak Unaffected")
-                    self.streak += 0
+                    result = Results.Tricked
+                    print("TRICKED: You Selected Higher, and Real Price: " + str(current_card.real_price) + " was exactly Fake Price: " + str(current_card.fake_price) + ". Streak Unaffected")
+                    self.current_streak_length += 0
                 elif choice == "lower":
-                    result = 'tricked'
-                    print("TRICKED: You Selected Lower, and Real Price: " + str(currentcard.realprice) + " was excatly Fake Price: " + str(currentcard.fakeprice) + ". Streak Unaffected")
-                    self.streak += 0
-        print(self.streak)
-        if self.beststreak < self.streak:
-            self.beststreak = self.streak
-        print(self.beststreak)
+                    result = Results.Tricked
+                    print("TRICKED: You Selected Lower, and Real Price: " + str(current_card.real_price) + " was excatly Fake Price: " + str(current_card.fake_price) + ". Streak Unaffected")
+                    self.current_streak_length += 0
+        print(self.current_streak_length)
+        if self.best_streak_length < self.current_streak_length:
+            self.best_streak_length = self.current_streak_length
+        print(self.best_streak_length)
 
-        if len(self.allcards) < 10:
-            self.allcards.extend(getCardlistFromDB(self.rarity,self.format))
+        if len(self.all_cards) < 10:
+            self.all_cards.extend(get_cardlist_from_db(self.rarity,self.format))
 
-        bottom = self.allcards.pop(0)
-        bottomcard = Card(cardname=bottom[0], cardsetfull=bottom[1], cardset=bottom[2], realprice=bottom[3], rarity=bottom[4])
-        self.q.append(bottomcard)
+        bottom = self.all_cards.pop(0)
+        bottomcard = Card(name=bottom[0], set_full=bottom[1], set=bottom[2], real_price=bottom[3], rarity=bottom[4])
+        self.queue.append(bottomcard)
 
-        self.q[0].getfakeprice(self.streak)
+        self.queue[0].get_multiplier(self.current_streak_length)
 
-        return self.q[0], bottomcard, self.beststreak, result
+        return self.queue[0], bottomcard, self.best_streak_length, result
 
 class Card:
-    def __init__(self, cardset = None, cardsetfull = None, cardname = None, realprice = 0, fakeprice = 0, image = None, rarity = None):
-        self.cardset = cardset if cardset else ''
-        self.cardsetfull = cardsetfull if cardsetfull else ''
-        self.cardname = cardname if cardname else ''
-        self.realprice = realprice if realprice else -1.0
-        self.image = image if image else getCardImageURL(cardname, cardset)
+    def __init__(self, set=None, set_full=None, name=None, real_price=0, fake_price=0, image=None, rarity=None):
+        self.set = set if set else ''
+        self.set_full = set_full if set_full else ''
+        self.name = name if name else ''
+        self.real_price = real_price if real_price else -1.0
+        self.image = image if image else get_image_url(name, set)
         self.rarity = rarity if rarity else ''
 
-        if fakeprice:
-            self.fakeprice = fakeprice
+        if fake_price:
+            self.fake_price = fake_price
         else:
-            self.getfakeprice(1)
+            self.fake_price = float(self.real_price) * self.get_multiplier(1)
 
-    def getfakeprice(self, streak, difficulty = 'easy'):
+    def get_multiplier(self, streak, difficulty='easy'):
         if difficulty is 'easy':
-            multiplier = 1 + uniform((-0.985**streak), (0.985**streak))
+            multiplier = 1 + uniform((-0.985 ** streak), (0.985 ** streak))
         elif difficulty is 'medium':
-            multiplier = 1 + uniform((-0.75**streak), (0.75**streak))
+            multiplier = 1 + uniform((-0.75 ** streak), (0.75 ** streak))
         elif difficulty is 'hard':
-            multiplier = 1 + uniform((-0.5**streak), (0.5**streak))
-        self.fakeprice = float(self.realprice) * multiplier
+            multiplier = 1 + uniform((-0.5 ** streak), (0.5 ** streak))
+        return multiplier
 
 class HighLowJsonEncoder(JSONEncoder):
     def default(self, obj):
         if isinstance(obj, Streak):
             return {
-                'allcards': obj.allcards, 
-                'streak': obj.streak,
-                'beststreak': obj.beststreak,
+                'all_cards': obj.all_cards, 
+                'current_streak_length': obj.current_streak_length,
+                'best_streak_length': obj.best_streak_length,
                 'rarity':obj.rarity,
                 'difficulty':obj.difficulty,
                 'format':obj.format,
-                'q': obj.q,
+                'queue': obj.queue,
             }
         elif isinstance(obj, Card):
             return {
-                'cardset': obj.cardset,
-                'cardsetfull': obj.cardsetfull, 
-                'cardname': obj.cardname,
-                'realprice': obj.realprice,
-                'fakeprice': obj.fakeprice,
+                'set': obj.set,
+                'set_full': obj.set_full, 
+                'name': obj.name,
+                'real_price': obj.real_price,
+                'fake_price': obj.fake_price,
                 'image': obj.image,
                 'rarity': obj.rarity,
             }
+        elif isinstance(obj, Enum):
+            return obj.name
         try:
             return super().default(obj.decode())
         except AttributeError:
@@ -148,9 +151,31 @@ class HighLowJsonDecoder(JSONDecoder):
         JSONDecoder.__init__(self,  *args, **kwargs)
 
     def deserialize(self, d): 
-        if 'allcards' in d:
+        if 'all_cards' in d:
             return Streak(**d)
-        elif 'cardname' in d:
+        elif 'name' in d:
             return Card(**d)
         else:
             return d
+
+class Rarities(Enum):
+    Common = "Common"
+    Uncommon = "Uncommon"
+    Rare = "Rare"
+    Mythic = "Mythic"
+
+class Results(Enum):
+    Lucky = "Lucky"
+    Unlucky = "Unlucky"
+    Incorrect = "Incorrect"
+    Correct = "Correct"
+    Tricked = "Tricked"
+    Error = "Error"
+
+class Difficulties(Enum):
+    Easy = "Easy"
+    Medium = "Medium"
+    Hard = "Hard"
+
+class Formats(Enum):
+    Standard = "standard"

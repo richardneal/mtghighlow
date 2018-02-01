@@ -8,19 +8,18 @@ app.json_decoder = HighLowJsonDecoder
 @app.route('/', methods=['GET'])
 def index():
     streak = session.get('streak', Streak())
-    cardlist = streak.q
     session["streak"] = streak
-    return render_template('index.html', cards=cardlist, beststreak=streak.beststreak, streak=streak.streak)
+    return render_template('index.html', cards=streak.queue, beststreak=streak.best_streak_length, streak=streak.current_streak_length)
 
 @app.route('/newcard')
 def newcard():
     print(request.args)
     choice = request.args.get('choice', 'error')
     streak = session["streak"]
-    currentcard, newcard, beststreak, correct = streak.new_card(choice)
-    print('Best Streak = ' + str(beststreak))
+    current_card, new_card, best_streak_length, correct = streak.new_card(choice)
+    print('Best Streak = ' + str(best_streak_length))
     session["streak"] = streak
-    return jsonify({"newcard":newcard, "streak":streak.streak, "currentcard":currentcard, "beststreak":beststreak, "correct":correct})
+    return jsonify({"new_card":new_card, "current_streak_length":streak.current_streak_length, "current_card":current_card, "best_streak_length":best_streak_length, "correct":correct})
 
 @app.route('/settings')
 def settings():

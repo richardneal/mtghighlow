@@ -218,3 +218,5 @@ obj/
 *.pyc
 
 .idea/
+mtghighlow/env1/
+mtghighlow/highlow/
